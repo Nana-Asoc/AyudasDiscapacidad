@@ -1,0 +1,436 @@
+<title>Ajudes Discapacitat</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: one question per screen, then a results list grouped by theme; highlighter-yellow nod to the marked-up paper listing. */
+:root{
+  --bg:#F4F6F8; --surface:#FFFFFF; --ink:#16233B; --muted:#5A667A; --line:#D9DFE7;
+  --accent:#1F4FD8; --accent-ink:#FFFFFF; --hi:#FFE45C; --ok:#1E7A4F; --ok-bg:#E3F4EA; --warn:#8A5A00; --warn-bg:#FFF1CC;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Figtree',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1624; --surface:#18233A; --ink:#EAF0FA; --muted:#9CA9BF; --line:#2A3752;
+  --accent:#7FA2FF; --accent-ink:#0F1624; --hi:#6B5B00; --ok:#6FD3A0; --ok-bg:#16382A; --warn:#F2C45A; --warn-bg:#3A2E0C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1624; --surface:#18233A; --ink:#EAF0FA; --muted:#9CA9BF; --line:#2A3752;
+  --accent:#7FA2FF; --accent-ink:#0F1624; --hi:#6B5B00; --ok:#6FD3A0; --ok-bg:#16382A; --warn:#F2C45A; --warn-bg:#3A2E0C; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:720px;margin-inline:auto}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.7rem,6vw,2.4rem)}
+.hi{background:linear-gradient(transparent 55%,var(--hi) 55%,var(--hi) 92%,transparent 92%)}
+.lead{color:var(--muted);margin:10px 0 0}
+.top{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+.eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:18px}
+.prog>i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.q h2{font-size:1.4rem}
+.help{color:var(--muted);margin:8px 0 0;font-size:.95rem}
+.opts{display:grid;gap:10px;margin-top:18px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt:focus-visible,.btn:focus-visible,.vid:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--surface);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt b{display:block;font-weight:600}
+.opt small{display:block;color:var(--muted);font-size:.88rem}
+.nav{display:flex;gap:10px;justify-content:space-between;margin-top:20px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;border-radius:10px;padding:11px 18px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.sum{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.chip{font-size:.82rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 11px;color:var(--muted)}
+.notice{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:12px 14px;margin:16px 0;font-size:.95rem}
+.grp{margin-top:30px}
+.grp>h2{font-size:1.2rem;margin-bottom:10px}
+.items{display:grid;gap:12px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.item.done{opacity:.72}
+.ih{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+.ih h3{font-size:1.08rem}
+.tag{flex:none;font-size:.74rem;font-weight:600;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.ask{background:var(--warn-bg);color:var(--warn)}
+.item p{margin:8px 0 0;color:var(--muted);font-size:.95rem}
+.item p.w{color:var(--ink)}
+.meta{display:grid;gap:4px;margin-top:10px;font-size:.9rem}
+.meta div{display:flex;gap:8px;min-width:0}
+.meta dt,.meta span.k{flex:none;color:var(--muted);width:74px}
+.meta .v{min-width:0;overflow-wrap:anywhere}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:10px;font-size:.9rem}
+.links .k{color:var(--muted);width:74px;flex:none}
+.links a{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.dt{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.92rem}
+.dt summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
+.dt ol,.dt ul{margin:6px 0 2px;padding-left:20px;display:grid;gap:6px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.vid{font:inherit;font-weight:600;font-size:.9rem;text-decoration:none;border-radius:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);display:inline-block}
+.vid.off{background:transparent;color:var(--muted);border:1.5px dashed var(--line);cursor:default}
+.chk{display:flex;gap:8px;align-items:center;font-size:.9rem;color:var(--muted);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.foot{margin-top:34px;font-size:.84rem;color:var(--muted)}
+.foot a{color:var(--accent)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.prog>i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Menores de 18 años · Sant Boi de Llobregat</span>
+    <h1>¿A qué ayudas tiene <span class="hi">derecho</span> tu hijo o hija?</h1>
+    <p class="lead">Responde unas preguntas y verás las ayudas que encajan, dónde se piden y, cuando esté disponible, un vídeo que lo explica paso a paso.</p>
+    <div class="notice"><strong>Aviso:</strong> esta web es una guía orientativa, revisada en octubre de 2026. No es una web oficial ni sustituye el asesoramiento de la Administración. Los requisitos, importes, plazos, teléfonos y direcciones pueden cambiar o contener errores: confirma siempre en el organismo oficial antes de hacer un trámite.</div>
+  </header>
+  <main id="app" aria-live="polite"></main>
+  <p class="foot">Información orientativa basada en el listado de la Direcció General de l'Autonomia Personal i la Discapacitat (Generalitat de Catalunya) y en fuentes oficiales consultadas en octubre de 2026. Importes, plazos y requisitos pueden cambiar: confirma siempre en el organismo indicado.</p>
+</div>
+
+<script>
+/* ===== VÍDEOS GUÍA: pega aquí el enlace de cada vídeo (YouTube, Vimeo...). Vacío = "Vídeo próximamente". ===== */
+const VIDEOS = {
+  grado:"", socials:"", cdiap:"", sumem:"",
+  acreditativa:"", prestacion:"", copago:"", deduccion:"", transporte:"", acompanante:"", donaciones:"",
+  matriculacion:"", circulacion:"", blanca:"", iva:"", aparcamiento:"", reserva:"", visual:"",
+  titulo:"", ibi:"", sirius:"", educativo:"", pua:"", smdt:"", perro:"", inserccion:"", vivienda:"", bono:"", recurso:""
+};
+
+const Q = [
+ {id:"cert",t:"¿Tiene ya el certificado de discapacidad?",h:"Es el reconocimiento de un grado igual o superior al 33 %. Casi todas las ayudas parten de él.",o:[
+   ["si","Sí, ya lo tiene","Grado igual o superior al 33 %"],["tramite","Lo hemos pedido","Estamos esperando la resolución"],["no","Todavía no lo hemos pedido",""]]},
+ {id:"edad",t:"¿Qué edad tiene?",h:"Algunas ayudas cambian según la edad.",o:[
+   ["u3","Menos de 3 años",""],["3","3 años",""],["4-11","De 4 a 11 años",""],["12-17","De 12 a 17 años",""]]},
+ {id:"mov",t:"¿Supera el baremo de movilidad?",h:"Aparece en la resolución del grado de discapacidad. Si no lo sabes, elige la última opción y míralo en el documento.",o:[
+   ["si","Sí, lo supera",""],["no","No lo supera",""],["nose","No lo sé todavía",""]]},
+ {id:"apar",t:"¿Depende de aparatos técnicos para las funciones vitales de forma continuada?",h:"Por ejemplo respirador o alimentación por sonda. Solo importa en menores de 3 años con pluridiscapacidad.",showIf:a=>a.edad==="u3",o:[
+   ["si","Sí",""],["no","No",""]]},
+ {id:"vis",t:"¿Tiene una agudeza visual de 0,1 o menos, o una discapacidad visual igual o mayor al 75 %?",h:"Da acceso a la tarjeta de aparcamiento aunque no se supere el baremo de movilidad.",o:[
+   ["si","Sí",""],["no","No",""]]},
+ {id:"tipo",t:"¿Cuántas personas adultas ejercen la guarda o tutela del menor?",h:"Sirve para saber si puede aplicar el título de familia monoparental. Elige la opción que describa vuestra situación, sea cual sea la composición de la familia.",o:[
+   ["pm","Dos o más (madres, padres, tutores u otras personas con la guarda)",""],["mono","Una sola (familia monoparental)",""]]},
+ {id:"num",t:"¿Tenéis el título de familia numerosa?",h:"Cuenta si lo tenéis o lo habéis solicitado.",o:[
+   ["si","Sí, ya lo tenemos",""],["tramite","Lo hemos pedido, está en trámite",""],["no","No",""]]},
+ {id:"veh",t:"¿Hay un vehículo que se use para transportar al menor, o pensáis comprarlo?",h:"Afecta a los impuestos de matriculación y circulación y al IVA.",o:[
+   ["si","Sí",""],["no","No",""]]},
+ {id:"cot",t:"¿Quien pediría las ayudas trabaja de alta en la Seguridad Social, cobra paro o cobra una pensión?",h:"Sirve para saber si puedes cobrar la deducción de 1.200 € cada mes por adelantado. Elige Sí si se cumple cualquiera de los tres casos.",o:[
+   ["si","Sí",""],["no","No",""]]},
+ {id:"extra",t:"¿Qué más te interesa?",h:"Marca todo lo que quieras. Puedes dejarlo vacío.",multi:true,o:[
+   ["edu","Becas, matrícula y adaptaciones en la escuela",""],["perro","Perro de asistencia",""],["ins","Formación e inserción laboral (PFI y PTT)","Pensado para la transición a la vida adulta"],
+   ["viv","Promociones de vivienda social",""],["bono","Bono social de la luz y otros suministros",""],["rec","Recursos residenciales o atención diurna",""]]}
+];
+
+const G={dinero:"Dinero y ayudas familiares",salud:"Salud y reconocimiento",mov:"Transporte y movilidad",veh:"Vehículo e impuestos",edu:"Educación, familia y vivienda",otras:"Otros apoyos en Sant Boi"};
+
+const AMB={t:"Área Metropolitana de Barcelona",u:"https://www.amb.cat"};
+const AMBT={t:"T-metropolitana (AMB)",u:"https://www.amb.cat/web/mobilitat/titols-i-tarifes/t-metropolitana"};
+const SBG={t:"Guía de recursos para personas con discapacidad de Sant Boi",u:"https://www.santboi.cat/Documents/Discapacitats/Guia-Recursos.pdf"};
+const SBD={t:"Trámites para personas con discapacidad (Ajuntament de Sant Boi)",u:"https://www.santboi.cat/ciutadania/persones-amb-discapacitat/tramits-destacats-que-poden-demanar-les-persones-amb"};
+const EMAP="eMAP (Pl. de l'Ajuntament 1): 93 635 12 12 · 93 635 12 00. Lunes a jueves 8:30-19:00, viernes 8:30-14:00. Cita en citaprevia.ubintia.com/santboi";
+
+/* s: "ok" encaja con tus respuestas · "ask" existe, pero hay que confirmar criterios.
+   w = qué es · steps = cómo se pide · need = requisitos y documentos · contact = teléfonos y direcciones · links = webs */
+const ITEMS=[
+ {id:"grado",g:"salud",s:()=>"ok",t:"Paso previo: reconocimiento del grado de discapacidad",org:"Equipo de Valoración (EVO) del CAD, Generalitat",
+  show:a=>a.cert!=="si",
+  ex:["Sin este certificado no se puede pedir casi nada de esta lista: ni la deducción, ni el transporte, ni las becas.", "Lo valoran en el CAD a partir de los informes del pediatra, del especialista y de la escuela o los terapeutas. Cuantos más informes actualizados llevéis, mejor."],
+  w:"El certificado del grado de discapacidad (33 % o más) es el documento que piden casi todas las ayudas. Si todavía no lo tenéis o está en trámite, es lo primero.",
+  steps:["Pide el reconocimiento del grado en la Oficina d'Afers Socials i Famílies de Sant Boi o directamente en el CAD.","Para menores, el centro de valoración es el CAD Infantil de Barcelona (Av. del Paral·lel 145, 2.ª planta).","El EVO valora al menor, indica el diagnóstico y el porcentaje, y también si se supera el baremo de movilidad.","La resolución suele tener validez indefinida, aunque puede revisarse si cambia la situación."],
+  need:["Informes médicos y psicológicos actualizados del menor","DNI o NIE del menor y de quien lo representa","Libro de familia"],
+  contact:["Oficina d'Afers Socials i Famílies, C. Bonaventura Aribau 11: 93 654 36 11","CAD Infantil Barcelona, Av. del Paral·lel 145, 2.ª planta: 93 458 99 08 · cadinfantil.tsf@gencat.cat","CAD Badal, Rambla Badal 102: 93 331 21 62 · 93 331 21 61"],
+  links:[SBG]},
+
+ {id:"acreditativa",g:"salud",s:()=>"ok",t:"Tarjeta acreditativa de la discapacidad",org:"Departament de Drets Socials i Inclusió · Oficina d'Afers Socials i Famílies de Sant Boi",
+  ex:["Enseñar la tarjeta en lugar del papel de la resolución al pedir la T-metropolitana rosa, una beca o la tarjeta de aparcamiento.", "Pedir descuentos o entradas reducidas en museos, cines o actividades de ocio que los ofrezcan (depende de cada sitio)."],
+  w:"Carné oficial que acredita el grado de discapacidad. Casi todas las demás ayudas parten de él. Es gratuito.",
+  steps:["En Sant Boi puedes pedirla en la Oficina d'Afers Socials i Famílies (C. Bonaventura Aribau 11). Llama antes al 93 654 36 11.","O por internet en Tràmits Gencat, con certificado digital o idCAT Mòbil, o con cita en una oficina de atención ciudadana o por videollamada.","Rellena la solicitud con los datos del menor y adjunta la documentación.","La resolución y la tarjeta llegan por correo en unos 3 meses."],
+  need:["Grado de discapacidad igual o superior al 33 % reconocido y vigente (definitivo o provisional)","Residencia habitual en Catalunya","DNI o NIE del menor","Libro de familia si lo pide el padre o la madre. Un tutor legal necesita resolución judicial o administrativa."],
+  contact:["Oficina d'Afers Socials i Famílies: 93 654 36 11","Teléfono 012 (Generalitat)"],
+  links:[{t:"Pedir la tarjeta en Tràmits Gencat",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/Targeta-acreditativa-de-la-discapacitat"},SBD]},
+
+ {id:"prestacion",g:"dinero",s:()=>"ok",t:"Prestación familiar por hijo a cargo con discapacidad",org:"Instituto Nacional de la Seguridad Social (INSS)",
+  ex:["Un ingreso periódico de la Seguridad Social por el hijo, que se puede usar en lo que más falte en casa: terapias, material escolar, comedor.", "No hace falta justificar en qué se gasta."],
+  w:"Ayuda económica periódica de la Seguridad Social para menores de 18 años con discapacidad igual o superior al 33 %. Según la Seguridad Social no se exige límite de ingresos cuando el hijo tiene discapacidad.",
+  steps:["Entra en la página de solicitud de la Seguridad Social e identifícate con Cl@ve (usuario y contraseña).","Elige el formulario «hijo a cargo» y rellénalo.","Adjunta la documentación (los anexos no pueden pesar más de 10 MB en total).","Firma con el código que llega por SMS al móvil que tienes declarado.","Guarda el acuse de recibo en PDF. El INSS envía la resolución a tu domicilio.","Si prefieres hacerlo en persona, en Sant Boi está la oficina del INSS en C. Eusebi Güell 41-43."],
+  need:["Menor de 18 años con discapacidad del 33 % o más, que viva con quien solicita y esté a su cargo","Certificado de discapacidad","DNI o NIE de quien solicita y del menor","Acreditar que no cobras una prestación incompatible por el mismo motivo","Modelo de representación, si lo pide otra persona"],
+  contact:["INSS Sant Boi, C. Eusebi Güell 41-43: 93 640 07 87 · 93 640 67 65 (datos de la guía municipal, sin fecha: confirma antes)","Seguridad Social: 901 16 65 65 (dato de 2020)"],
+  links:[{t:"Solicitud online (Seguridad Social)",u:"https://prestaciones.seg-social.es/servicio/prestacion-familiar-cuidado-hijos-discapacidad.html"},{t:"Seguridad Social",u:"https://www.seg-social.es"}]},
+
+ {id:"copago",g:"salud",s:()=>"ok",t:"Exención del copago farmacéutico",org:"INSS, farmacia y CAP",
+  ex:["Receta de un antibiótico, un anticonvulsivante o un inhalador financiados por la Seguridad Social: en la farmacia pagas 0 € pasando la tarjeta sanitaria del menor.", "Ojo, esta ayuda es solo para medicamentos con receta financiados. No cubre pañales o absorbentes, cremas o productos de parafarmacia, ni medicamentos sin receta o no financiados. Para los pañales, pregunta al pediatra o en el CAP si hay alguna vía de financiación: no he podido confirmarlo."],
+  w:"Desde 2021 los menores de 18 años con discapacidad igual o superior al 33 % no pagan la parte de los medicamentos con receta. En el listado de la Generalitat aparece como «Farmacia gratuita (LISMI)»: es la misma ventaja. LISMI es el nombre de la antigua ley de 1982 que la creó, y para un menor con el certificado esta exención es la vía vigente.",
+  steps:["Pasa la tarjeta sanitaria del menor por la farmacia: debe salir sin aportación (código TSI 001).","Si la farmacia te cobra, pide al INSS que active la exención. El INSS tiene un formulario para menores que no constaban en sus datos.","Para dudas, llama al 061 o pregunta en tu CAP."],
+  need:["Menor de 18 años con certificado de discapacidad del 33 % o más","Tarjeta sanitaria del menor"],
+  contact:["Teléfono 061","INSS Sant Boi, C. Eusebi Güell 41-43: 93 640 07 87"],links:[]},
+
+ {id:"deduccion",g:"dinero",s:()=>"ok",t:"Deducción de hasta 1.200 € al año por descendiente con discapacidad",org:"Agencia Tributaria (AEAT)",
+  ex:["Cobrar 100 € al mes por adelantado en la cuenta del padre, madre o tutor: por ejemplo, para pagar sesiones de logopedia o fisioterapia.", "O no pedir el adelanto y restar los 1.200 € del año en la declaración de la renta."],
+  w:"Hasta 1.200 € al año por hijo (100 € al mes). Puedes cobrarlo cada mes por adelantado o aplicarlo en la declaración de la renta.",
+  steps:["Entra en la sede de la AEAT en el trámite del modelo 143, con DNI electrónico, certificado electrónico o Cl@ve PIN. También se puede presentar por teléfono o en una oficina.","Rellena un modelo 143 por cada hijo y marca «descendientes con discapacidad a cargo».","Indica la fecha de efectos del grado de discapacidad y el organismo que lo reconoció.","Escribe la cuenta bancaria de quien cobra y firma.","La AEAT resuelve en 6 meses. Si procede, paga cada mes por transferencia.","Si no pides el adelanto, aplica la deducción en la renta (casilla 0623; casilla 0624 si cobraste por adelantado)."],
+  need:["NIF de quien solicita y del menor","Cuenta bancaria de la que sea titular quien cobra","Para el cobro por adelantado, quien pide debe estar de alta en la Seguridad Social al menos 15 días del mes (jornada completa), o todo el mes si es a tiempo parcial con jornada de al menos el 50 %. Si cobra paro (contributivo o asistencial) o una pensión de la Seguridad Social o de Clases Pasivas, también cumple. Estar apuntado en el paro sin cobrar no basta.","Además, el menor no puede superar 8.000 € de rentas al año","Certificado de discapacidad, si la AEAT lo pide"],
+  contact:["AEAT: 901 33 55 33","Oficina tributaria de Cornellà, C. Vicens Livina 1: 93 377 71 51 (dato de la guía municipal: confirma antes)"],
+  note:a=>a.cot==="no"?"Si no trabajas de alta, ni cobras paro ni pensión, no puedes cobrar la deducción cada mes. Sí puedes aplicarla en la declaración de la renta.":"",
+  links:[{t:"Modelo 143 (solicitud)",u:"https://sede.agenciatributaria.gob.es/Sede/procedimientos/G613.shtml"},{t:"Cómo se aplica en la renta",u:"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c18-cuota-liquida-resultante-autoliquidacion/resultado-declaracion/deducciones-familia-numerosa-personas-discapacidad-cargo/aplicacion-deduccion-declaracion-irpf.html"}]},
+
+ {id:"transporte",g:"mov",s:()=>"ok",t:"Tarjeta social de transporte público (T-metropolitana rosa)",org:"Área Metropolitana de Barcelona (AMB). Sant Boi pertenece al AMB.",
+  ex:["Ir al colegio, al CDIAP o al hospital en bus, metro o tranvía con la T-metropolitana rosa, gratis o con descuento según los ingresos.", "No vale en Rodalies ni en servicios especiales."],
+  w:"Título de transporte del AMB para personas con discapacidad con ingresos bajos, gratuito o reducido. Sustituye a la antigua tarjeta rosa. Sirve en todo el transporte público metropolitano, excepto Rodalies y servicios especiales.",
+  steps:["Haz la solicitud en la sede electrónica de la AMB («Sol·licitud de la T-metropolitana targeta rosa»).","Si prefieres papel, pide el impreso en el ayuntamiento (eMAP).","Si ya tienes la tarjeta rosa antigua, la AMB te envía la nueva a casa."],
+  need:["Certificado de discapacidad","Empadronamiento en un municipio del AMB","La ordenanza metropolitana fija los requisitos de edad, discapacidad e ingresos, pero no he podido ver los umbrales: pregúntalos al 900 70 00 77"],
+  contact:["AMB: 900 70 00 77 (lunes a viernes, 9-18 h)",EMAP],
+  links:[{t:"Solicitud de la T-metropolitana rosa (AMB)",u:"https://www.amb.cat/web/amb/seu-electronica/tramits/detall/-/tramit/sol-licitud-de-la-t-metropolitana-targeta-rosa/17176884/11696"},AMBT]},
+
+ {id:"acompanante",g:"mov",s:()=>"ok",t:"Pase de acompañante (T-metropolitana)",org:"Área Metropolitana de Barcelona (AMB)",
+  show:a=>a.edad==="4-11"||(a.edad==="12-17"&&a.mov==="si"),
+  ex:["Un adulto acompaña al niño al cole o a terapia sin pagar billete, usando el pase del menor.", "No vale en la red de FGC."],
+  w:"El acompañante viaja gratis. De 4 a 12 años se concede sin baremo. A partir de 12 años, solo si se supera el baremo de movilidad. Se emite a nombre del menor y la usa quien lo acompaña. No vale en la red de FGC.",
+  steps:["Consigue el certificado que acredita que el menor necesita acompañante en el transporte público.","Solicita el pase en la sede electrónica de la AMB (T-metropolitana, pase de acompañante).","Recibes la tarjeta en casa. En 2024 costaba 4,50 € la tarjeta más una tasa anual de 5,90 €: confirma el precio actual en la AMB."],
+  need:["El menor debe tener más de 4 años","Estar empadronado en un municipio del AMB","Certificado de necesidad de acompañante (lo emite el Departament de Drets Socials)","DNI o NIE del menor, que se puede pedir en una inspección"],
+  contact:["AMB: 900 70 00 77 (lunes a viernes, 9-18 h)"],
+  links:[{t:"Pase de acompañante (TMB)",u:"https://www.tmb.cat/en/barcelona-fares-metro-bus/t-metropolitana-companion-pass"},AMBT]},
+
+ {id:"blanca",g:"mov",s:()=>"ask",t:"Transporte adaptado (Sant Boi y Baix Llobregat)",org:"Ajuntament de Sant Boi de Llobregat y Consell Comarcal del Baix Llobregat",
+  show:a=>a.mov==="si",
+  ex:["Ir a una cita con un especialista o a terapia en un vehículo adaptado, con la silla de ruedas, y un adulto acompañante.", "Hay que confirmar con el Ayuntamiento que el servicio acepta menores con acompañante."],
+  w:"Hay dos servicios distintos. 1) Transporte adaptado «fijo» (rutas a centros) y «a la demanda» (desplazamientos puntuales: gestiones, compras, ocio), del Consell Comarcal del Baix Llobregat, que se pide a través de los servicios sociales del municipio. Un menor puede usarlo si viaja con su propia persona acompañante (en las rutas fijas hay una figura de acompañante). 2) El transporte «puerta a puerta» entre municipios que publica el Ayuntamiento de Sant Boi, que es solo para mayores de 18 años y no sirve para menores. Que Sant Boi tenga plazas o esté dentro del servicio comarcal conviene confirmarlo en el Ayuntamiento, porque su ficha no menciona a los menores.",
+  steps:["Llama a la Oficina d'Afers Socials i Famílies (93 654 36 11) o a la eMAP (93 635 12 12) y pregunta por el transporte adaptado para un menor con acompañante.","Si te lo confirman, inicia el trámite «Transport adaptat fix» en la sede electrónica de Sant Boi o con cita previa en la eMAP.","Aporta el certificado de discapacidad con baremo de movilidad positivo y el informe médico (silla de ruedas, muletas o bastones, insuficiencia respiratoria o cardíaca grave, o trastorno grave de conducta que impida usar el transporte público).","Una vez dado de alta, en el servicio a la demanda se reserva hora y lugar llamando directamente a la empresa transportista.","No pidas el «puerta a puerta»: es solo para mayores de 18 años."],
+  need:["Certificado de discapacidad con baremo de movilidad positivo","Informe médico que indique la limitación (lo pide el servicio comarcal)","Empadronamiento en Sant Boi","Una persona acompañante para el menor"],
+  contact:[EMAP,"Consell Comarcal del Baix Llobregat – transporte adaptado: 93 685 24 00 · transportadaptat@elbaixllobregat.cat","Oficina d'Afers Socials i Famílies: 93 654 36 11"],
+  links:[{t:"Servei de Transport Adaptat (Consell Comarcal del Baix Llobregat)",u:"https://www.elbaixllobregat.cat/serveitransportadaptat"},{t:"Transporte adaptado fijo (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=2104"},{t:"Trámites destacados para personas con discapacidad (Sant Boi)",u:"https://santboi.cat/ciutadania/persones-amb-discapacitat/tramits-destacats"},SBD]},
+
+ {id:"aparcamiento",g:"mov",s:a=>a.edad==="3"?"ask":"ok",t:"Tarjeta de aparcamiento para personas con discapacidad",org:"Ajuntament de Sant Boi de Llobregat",
+  show:a=>(a.edad==="u3"&&a.apar==="si")||(a.edad!=="u3"&&a.mov==="si"),
+  ex:["Aparcar o parar lo más cerca posible de la puerta del médico, del hospital o de la escuela.", "Bajar con calma la silla de ruedas, sin tener que aparcar lejos."],
+  w:"Permite aparcar o parar lo más cerca posible del punto de acceso o destino. Es personal e intransferible y vale en toda Catalunya, España y la UE. El menor figura como titular «no conductor».",
+  steps:["Entra en la ficha del trámite «Targeta d'aparcament» en la sede electrónica de Sant Boi y rellena la solicitud.","Si lo prefieres, pídelo en la eMAP con cita previa.","Aporta la documentación.","Coloca siempre la cara delantera de la tarjeta visible en el coche donde viaja el menor.","En caso de pérdida o robo, pide un duplicado con copia de la denuncia."],
+  need:["Resolución del grado de discapacidad con baremo de movilidad positivo, o la tarjeta acreditativa","Más de 3 años. A los 3 años o menos solo con pluridiscapacidad que dependa de aparatos técnicos, con certificado del CAD Infantil (Av. del Paral·lel 145, 93 458 99 08)","DNI, NIE o pasaporte del menor","Documento de representación legal si no lo pide el padre o la madre","Fotos y resto de documentos: confirma la lista exacta en la ficha de Sant Boi"],
+  contact:[EMAP],
+  note:a=>a.edad==="3"?"Con 3 años justos, confirma con el ayuntamiento si ya te corresponde.":"",
+  links:[{t:"Tarjeta de aparcamiento (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=1767"},SBD]},
+
+ {id:"visual",g:"mov",s:()=>"ok",t:"Tarjeta de aparcamiento por discapacidad visual",org:"Ajuntament de Sant Boi de Llobregat",show:a=>a.vis==="si",
+  ex:["Aparcar cerca del destino cuando la discapacidad visual es grave, aunque no se supere el baremo de movilidad."],
+  w:"Para quien no supera el baremo de movilidad pero tiene una discapacidad visual grave. No da derecho a una reserva de estacionamiento.",
+  steps:["Pide el certificado de déficit visual al CAD de la Generalitat (en Barcelona, Av. del Paral·lel 145).","Presenta la solicitud de la tarjeta de aparcamiento en el ayuntamiento, con ese certificado y el resto de documentos."],
+  need:["Agudeza visual de 0,1 o menos con corrección, o campo visual reducido a 10 grados o menos (según información municipal)","Certificado de déficit visual","Documentos habituales de la tarjeta: DNI o NIE del menor"],
+  contact:["CAD Infantil: 93 458 99 08",EMAP],
+  links:[{t:"Tarjeta de aparcamiento (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=1767"}]},
+
+ {id:"reserva",g:"mov",s:()=>"ask",t:"Reserva de plaza de aparcamiento",org:"Ajuntament de Sant Boi de Llobregat",show:a=>a.mov==="si",
+  ex:["Tener una plaza reservada cerca de casa, en la calle, en lugar de dar vueltas con el niño y la silla.", "Solo si no tenéis garaje propio ni alquilado."],
+  w:"Espacio reservado en la vía pública, lo más cerca posible del domicilio, del trabajo o del centro de estudios. Hay dos modalidades: titular conductor y titular no conductor.",
+  steps:["Primero consigue la tarjeta de aparcamiento.","Entra en la ficha del trámite «Reserva de plaça d'aparcament» en la sede electrónica de Sant Boi y presenta la solicitud.","Para ayuda con la solicitud, acude a la eMAP con cita previa."],
+  need:["No tener plaza de garaje propia ni alquilada","Tarjeta de aparcamiento vigente (normalmente)","Más requisitos y documentos: míralos en la ficha del trámite"],
+  contact:[EMAP],
+  links:[{t:"Reserva de plaza (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=1753"}]},
+
+ {id:"matriculacion",g:"veh",s:()=>"ok",t:"Exención del impuesto de matriculación",org:"Agencia Tributaria (AEAT)",show:a=>a.veh==="si",
+  ex:["Comprar un coche adaptado o con rampa a nombre del menor, o de quien lo transporta, y no pagar el impuesto de matriculación."],
+  w:"No pagas el impuesto especial de matriculación al matricular un vehículo a nombre de la persona con discapacidad.",
+  steps:["Antes de matricular, presenta el modelo 05 con la clave ER4 en la Delegación o Administración de la AEAT de tu domicilio fiscal.","Indica nombre, NIF y domicilio de quien solicita, y la clase, marca y modelo del vehículo, y adjunta el certificado de discapacidad y la ficha técnica.","Con el reconocimiento de la AEAT, haz la matriculación definitiva."],
+  need:["Certificado de discapacidad","Ficha técnica del vehículo","Vehículo matriculado a nombre de la persona con discapacidad y de uso exclusivo","Han de pasar 4 años desde el último vehículo con exención, y no se puede transmitir en 4 años","Al ser menor, confirma con la AEAT cómo se tramita"],
+  contact:["AEAT: 901 33 55 33"],
+  links:[{t:"Exención del impuesto de matriculación",u:"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/manual-especifico-personas-discapacidad/impuesto-matriculacion/exencion-medios-transporte-nombre-personas-discapacidad.html"}]},
+
+ {id:"circulacion",g:"veh",s:()=>"ask",t:"Exención del impuesto de circulación (IVTM)",org:"Ajuntament de Sant Boi de Llobregat",show:a=>a.veh==="si",
+  ex:["No pagar el impuesto anual de circulación (el «sello del coche») del vehículo en el que se desplaza el menor. Las condiciones exactas las fija el Ayuntamiento: confírmalas antes."],
+  w:"Exención para un vehículo a nombre de la persona con discapacidad o destinado a su transporte. Las condiciones las fija la ordenanza fiscal de Sant Boi, que no he podido leer.",
+  steps:["Consulta la ordenanza fiscal del IVTM en la sede electrónica de Sant Boi o pregunta en la eMAP.","Pide el formulario de exención y presenta la solicitud con los documentos, en la eMAP o por la sede electrónica.","Hazlo antes del periodo de pago voluntario, mejor en el primer trimestre del año, porque normalmente no es retroactiva."],
+  need:["DNI o NIE del titular","Permiso de circulación y ficha técnica (ITV)","Certificado de empadronamiento","Certificado de discapacidad","Un solo vehículo por beneficiario, con ITV en vigor (condiciones habituales: confirma las de Sant Boi)"],
+  contact:[EMAP],
+  links:[{t:"Ordenanzas fiscales de Sant Boi",u:"https://seuelectronica.santboi.cat/Publi160.nsf/ca-VistaWeb-BASE?ReadForm&Clau=OFiscals&Idioma=ca&Seu=S"}]},
+
+ {id:"iva",g:"veh",s:()=>"ok",t:"IVA del 4 % en la compra del vehículo",org:"Agencia Tributaria (AEAT)",show:a=>a.veh==="si"&&a.mov==="si",
+  ex:["Comprar un coche pagando el 4 % de IVA en vez del 21 %. En un coche de 20.000 € sin IVA, el IVA baja de 4.200 € a 800 €."],
+  w:"IVA del 4 % en vez del 21 % al comprar un vehículo que transporte habitualmente a una persona con movilidad reducida, sea quien sea el conductor.",
+  steps:["Antes de comprar, pide el «Reconocimiento del derecho» en la sede electrónica de la AEAT.","Con el reconocimiento, compra el vehículo con IVA del 4 %.","Si el reconocimiento llega después de comprar, pide al concesionario una factura rectificativa o presenta un escrito a la AEAT con la factura."],
+  need:["Certificado de discapacidad y de movilidad reducida","Han pasado 4 años desde otro vehículo con este beneficio, y no se puede transmitir en 4 años","Acreditar el destino: vehículo a nombre del menor, parentesco hasta tercer grado, ser tutor o representante legal, o convivencia (empadronamiento)"],
+  contact:["AEAT: 901 33 55 33"],
+  links:[{t:"IVA reducido en vehículos (AEAT)",u:"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/manual-especifico-personas-discapacidad/iva/aplicacion-tipos-reducidos/vehiculos.html"}]},
+
+ {id:"donaciones",g:"veh",s:()=>"ask",t:"Beneficios en el impuesto de donaciones y sucesiones",org:"Agència Tributària de Catalunya (ATC)",
+  ex:["Si unos abuelos dejan una herencia o hacen una donación al menor, hay reducciones en el impuesto. Confirma las cifras con un gestor o en la Agència Tributària de Catalunya."],
+  w:"La discapacidad da derecho a beneficios fiscales en este impuesto en Catalunya, según el grado (33 % o 65 %). No he podido confirmar las reducciones concretas.",
+  steps:["Cuando haya una herencia o una donación a favor del menor, presenta la autoliquidación en la ATC y aplica los beneficios por discapacidad.","Consulta a la ATC antes de firmar, porque los importes cambian con cada normativa."],
+  need:["Certificado de discapacidad del órgano de Drets Socials, que acredita el 33 % o el 65 %","Una resolución del INSS solo sirve para el 33 %. Para el 65 % hace falta el reconocimiento del órgano autonómico."],
+  contact:["ATC: 012"],links:[{t:"Agència Tributària de Catalunya",u:"https://atc.gencat.cat"}]},
+
+ {id:"titulo",g:"edu",s:()=>"ask",t:"Título de familia numerosa o monoparental",org:"Departament de Drets Socials i Inclusió",
+  ex:["Con el título se piden descuentos como el del IBI, el bono social de la luz, el transporte o las becas.", "Con 2 hijos puede ser familia numerosa si uno tiene un 33 % o más de discapacidad."],
+  w:"Reconoce a la familia y da acceso a ventajas (IBI, bono social, transporte, becas). La ley estatal permite que una familia con 2 hijos sea numerosa si alguno tiene una discapacidad igual o superior al 33 %.",
+  steps:["Entra en Tràmits Gencat y elige «Demanar el títol» (primera vez), «Renovar» o «Demanar un certificat».","Familia numerosa y monoparental son trámites distintos: elige el vuestro.","Si ya lo tienes, guárdalo en «La meva Cartera» para pedir otras ayudas.","En Sant Boi puedes consultar dudas en la Oficina d'Afers Socials i Famílies (93 654 36 11)."],
+  need:["Los requisitos y documentos no aparecen detallados en la página: se indican dentro de cada opción del trámite","Libro de familia y DNI o NIE de los miembros (lo habitual)"],
+  contact:["Oficina d'Afers Socials i Famílies: 93 654 36 11","Teléfono 012"],
+  note:a=>a.tipo==="mono"?"Al ser una familia con una sola persona adulta responsable, mira el título de familia monoparental.":(a.num==="no"?"Comprueba si vuestra familia puede ser numerosa, porque la discapacidad puede contar en el cálculo.":(a.num==="tramite"?"Guarda el justificante de la solicitud mientras llega el título.":"")),
+  links:[{t:"Título de familia numerosa",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/Titol-de-familia-nombrosa"},{t:"Título de familia monoparental",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/Titol-de-familia-monoparental-00001"}]},
+
+ {id:"ibi",g:"edu",s:()=>"ask",t:"Bonificación del IBI por familia numerosa",org:"Ajuntament de Sant Boi de Llobregat",show:a=>a.num==="si"||a.num==="tramite",
+  ex:["Un descuento en el recibo anual del IBI de la vivienda habitual."],
+  w:"Descuento en el IBI de la vivienda habitual. La ley permite hasta el 90 %, pero el porcentaje y las condiciones los fija la ordenanza fiscal de Sant Boi, que no he podido leer.",
+  steps:["Pregunta en la eMAP si la bonificación se aplica sola o hay que pedirla, y en qué plazo.","Si hay que pedirla, presenta la solicitud en la eMAP o por la sede electrónica con el título en vigor.","Consulta la ordenanza fiscal del IBI en la sede electrónica."],
+  need:["Título de familia numerosa en vigor (si el título es individual, el de todos los miembros)","DNI del titular del recibo","Que la vivienda sea el domicilio habitual (lo habitual)"],
+  contact:[EMAP],
+  links:[{t:"Ordenanzas fiscales de Sant Boi",u:"https://seuelectronica.santboi.cat/Publi160.nsf/ca-VistaWeb-BASE?ReadForm&Clau=OFiscals&Idioma=ca&Seu=S"}]},
+
+ {id:"educativo",g:"edu",s:()=>"ask",t:"Becas y apoyos en la escuela",org:"Ministerio de Educación, OME de Sant Boi y centro educativo",show:a=>(a.extra||[]).includes("edu"),
+  ex:["Beca NEAE: ayuda para comedor, transporte escolar, material y reeducación (por ejemplo logopedia o fisioterapia), más un subsidio fijo de 400 € sin límite de renta.", "Apoyos en el aula, como adaptaciones del material o personal de apoyo, según lo que indique el informe del EAP."],
+  w:"Beca estatal para alumnado con necesidades específicas de apoyo educativo (enseñanza, comedor, transporte, material y reeducación, y un subsidio fijo de 400 € sin límite de renta). En Sant Boi hay además apoyos en las escuelas.",
+  steps:["La convocatoria del curso 2026-27 se cerró el 10 de septiembre de 2026. Solo se admiten solicitudes hasta el 31 de enero de 2027 si la necesidad surgió después del plazo y se acredita.","Se pide por internet en la sede del Ministerio con Cl@ve o certificado digital. El menor firma a través de su representante legal. Dudas: 910 837 937.","Para la escolarización y los apoyos en Sant Boi, habla con la Oficina Municipal de Escolarización (OME) y con la dirección y orientación del centro.","El EAP (Equipo de Asesoramiento Psicopedagógico) orienta a los centros y de forma indirecta a las familias."],
+  need:["Que el menor esté escolarizado, con una necesidad específica de apoyo educativo acreditada","Renta y patrimonio dentro de los límites de la convocatoria (salvo el subsidio fijo de 400 €)","Confirma el grado mínimo de discapacidad en la convocatoria vigente"],
+  contact:["Ministerio de Educación: 910 837 937","OMAP / OME, Pl. de l'Ajuntament 1: 93 635 12 12 · omap@santboi.cat","EAP, Ctra. Santa Creu de Calafell 6: 93 554 17 22","Serveis Territorials d'Educació Baix Llobregat-Anoia (Sant Feliu): 93 685 94 50","Escuela de educación especial Balmes: 93 640 04 20"],
+  links:[{t:"Sede del Ministerio de Educación",u:"https://sede.educacion.gob.es"},{t:"Becas del Ministerio",u:"https://www.becaseducacion.gob.es"},SBG]},
+
+ {id:"perro",g:"edu",s:()=>"ask",t:"Acreditación de perro de asistencia",org:"Departament de Drets Socials i Inclusió",show:a=>(a.extra||[]).includes("perro"),
+  ex:["Poder entrar con el perro de asistencia al colegio, al transporte y a tiendas, con el reconocimiento oficial que lo avala."],
+  w:"Reconoce oficialmente al perro y a la persona usuaria. Es gratuito y lo puede pedir la persona o el centro de adiestramiento.",
+  steps:["Rellena el formulario en Tràmits Gencat con certificado digital o idCAT Mòbil.","O descárgalo, fírmalo y preséntalo en un registro sin cita.","La resolución llega en un máximo de 3 meses. Pasado ese plazo, la solicitud puede entenderse rechazada."],
+  need:["Perro adiestrado por un centro reconocido, con microchip, revisión veterinaria anual y seguro de responsabilidad civil de 150.000 €","Foto de cuerpo entero de la persona con el perro, vertical y en color","Contrato firmado de cesión o seguimiento e informe del centro de adiestramiento","Documento de representación si no está inscrito en el Registro de representación (Representa)"],
+  contact:["Teléfono 93 882 25 91 (lunes a viernes, 9 a 14 h)","Subdirecció General d'Accessibilitat, Pg. del Taulat 266-270, Barcelona","Consulta del estado: 012"],
+  links:[{t:"Acreditación del perro de asistencia",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/Acreditacio-dun-gos-dassistencia-i-la-unitat-de-vinculacio"}]},
+
+ {id:"inserccion",g:"edu",s:()=>"ask",t:"Formación e inserción laboral (PFI, PTT e IFE)",org:"Departament d'Educació y Ajuntament de Sant Boi",show:a=>(a.extra||[]).includes("ins"),
+  ex:["A partir de los 16 años, hacer un PFI de un año para aprender un oficio básico y practicar en una empresa.", "Los IFE, de 16 a 20 años, son itinerarios específicos para discapacidad intelectual leve o moderada."],
+  w:"El PFI (Programa de Formación e Inserción) es un curso de un año con formación general y profesional. El PTT (Plan de Transición al Trabajo) es un PFI organizado con el ayuntamiento. Para 16 a 20 años con discapacidad intelectual leve o moderada existen los Itinerarios Formativos Específicos (IFE).",
+  steps:["Habla con el tutor o el orientador del instituto, normalmente en 4.º de ESO, para que valore al alumno y os informe de los PFI, PTT e IFE disponibles.","Para orientación laboral con certificado de discapacidad, pide cita en el Servicio de Integración Sociolaboral y Oficina Técnica Laboral del ayuntamiento.","La inscripción en los programas la gestiona el centro o la entidad que los organiza. No he encontrado un trámite general en línea."],
+  need:["PFI y PTT: entre 16 y 21 años y no haber obtenido el título de ESO","IFE: de 16 a 20 años con discapacidad intelectual leve o moderada","Certificado de discapacidad para los servicios de empleo"],
+  contact:["Servicio de Integración Sociolaboral y OTL, Masia Torre Figueres, C. Pau Claris 14: 93 635 12 46 · ocupacio@santboi.cat","Centro de Formación de Personas Adultas, L'Olivera: 93 640 16 78"],
+  links:[SBG,{t:"Recursos y servicios para personas con discapacidad (Sant Boi)",u:"https://www.santboi.cat/ciutadania/persones-amb-discapacitat/recursos-i-serveis"}]},
+
+ {id:"vivienda",g:"edu",s:()=>"ask",t:"Vivienda social y protegida",org:"Registro de solicitantes de vivienda protegida y Oficina Local d'Habitatge de Sant Boi",show:a=>(a.extra||[]).includes("viv"),
+  ex:["Inscribirse ya en el Registro de Solicitantes para poder optar a una vivienda protegida cuando salga una promoción.", "En las promociones nuevas, el 3 % de los pisos se reserva para personas con movilidad reducida."],
+  w:"Para optar a una vivienda con protección oficial hay que estar inscrito en el Registro de Solicitantes. Las promociones de obra nueva con protección oficial deben reservar un 3 % de pisos para personas con movilidad reducida.",
+  steps:["Date de alta en idCAT Mòbil o consigue un certificado digital: lo piden tanto para la vía telemática como para la presencial.","Inscríbete por internet en el Registro de Solicitantes, o en persona: de 18 a 35 años en El Punt (Can Massallera, C. Mallorca 30, 93 652 98 43) y a partir de 35 años en la eMAP (Pl. de l'Ajuntament 1, 93 635 12 12, con cita).","Espera la resolución de la Generalitat: tiene hasta 3 meses para notificar la inscripción.","Renueva la inscripción cada 2 años, hasta 90 días antes de que caduque.","Pide asesoramiento gratuito en la Oficina Local d'Habitatge (lunes a viernes, 9 a 14 h)."],
+  need:["Solicitud firmada por todos los mayores de edad de la unidad de convivencia, y declaración responsable","DNI o NIE, y libro de familia si hay hijos menores","Volante de empadronamiento con fecha de alta (si se tramita por internet)","Ingresos de todas las personas mayores de 16 años (declaración de la renta, certificados de ingresos...)","La página no menciona reserva específica por discapacidad: pregunta en cada promoción"],
+  contact:["Oficina Local d'Habitatge: 93 635 12 23 · olhsantboi@santboi.cat","eMAP: 93 635 12 12","El Punt: 93 652 98 43"],
+  links:[{t:"Registro de Solicitantes de vivienda protegida",u:"https://www.registresolicitants.cat/registre/"},{t:"Inscripción desde Sant Boi (sede)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=2118"}]},
+
+ {id:"bono",g:"edu",s:()=>"ask",t:"Bono social de la luz",org:"Tu comercializadora de referencia",show:a=>(a.extra||[]).includes("bono"),
+  ex:["Un descuento en la factura de la luz: el 42,5 % o el 57,5 % según el caso, con límites de consumo. Por ejemplo, una factura de 100 € dentro del límite pasaría a 57,50 € o a 42,50 €."],
+  w:"Descuento del 42,5 % (consumidor vulnerable) o del 57,5 % (vulnerable severo), con límites de consumo, según Consumo Responde.",
+  steps:["Pide el bono a tu comercializadora de referencia (Endesa, Iberdrola, Naturgy, EDP, Viesgo...) por teléfono, web, oficina o correo.","Presenta la documentación que te pidan.","La comercializadora tiene 5 días hábiles para revisarla y 15 para avisar si falta algo.","Se renueva cada 2 años con la misma documentación."],
+  need:["Potencia contratada de 10 kW o menos, tarifa PVPC y vivienda habitual","Ser vulnerable por renta o por familia numerosa con título en vigor. La discapacidad del 33 % o más no da derecho por sí sola, pero sube el límite de renta.","DNI o NIE, certificado de empadronamiento y libro de familia","Título de familia numerosa, si lo alegas"],
+  contact:["Consumo Responde: 900 215 080"],links:[{t:"Consumo Responde",u:"https://www.consumoresponde.es/artículos/el_bono_social_electrico"}]},
+
+ {id:"recurso",g:"edu",s:()=>"ask",t:"Centros de día y recursos residenciales",org:"Departament de Drets Socials i Inclusió y servicios sociales de Sant Boi",show:a=>(a.extra||[]).includes("rec"),
+  ex:["A los 20-21 años, plaza en un centro de día donde pasar la jornada con talleres y actividades, cuando termina la escuela."],
+  w:"Servicios diurnos y sociolaborales y recursos residenciales. Se tramitan al terminar la escuela, hacia los 20-21 años, pero el CAD puede orientar antes.",
+  steps:["Pide o revisa el grado de discapacidad.","Pide el reconocimiento de la situación de dependencia. En Sant Boi, la primera acogida está en Cal Ninyo (C. Major 43) y en la Oficina d'Afers Socials i Famílies.","Pide la valoración de orientación a servicios diurnos y sociolaborales. El EVO del CAD te puede citar y envía el resultado a tu domicilio.","Cuando se abra la convocatoria, haz la preinscripción por internet en unos 15 días. Puedes elegir hasta dos centros. La plaza se hace efectiva el 1 de septiembre."],
+  need:["Residencia legal y empadronamiento en Catalunya","Grado de discapacidad del 33 % o más y resolución de dependencia","Dictamen de orientación del EVO","DNI vigente, informes médicos y psicológicos actualizados"],
+  contact:["Cal Ninyo (primera acogida, dependencia): 93 635 12 20","Oficina d'Afers Socials i Famílies: 93 654 36 11","Departament de Drets Socials, Pg. del Taulat 266-270, Barcelona: 93 483 10 00"],links:[SBG]},
+
+ {id:"smdt",g:"dinero",s:a=>a.edad==="u3"?"ask":"ok",t:"Subsidio de movilidad y compensación por gastos de transporte",org:"Departament de Drets Socials i Inclusió",show:a=>a.mov==="si"&&a.edad!=="u3",
+  ex:["Un ingreso periódico para pagar taxis o transporte privado cuando el menor no puede usar el bus o el metro. Solo desde los 3 años y con ingresos bajos."],
+  w:"Prestación económica periódica para cubrir desplazamientos de personas con discapacidad que tienen graves dificultades para usar el transporte público. Procede de la LISMI.",
+  steps:["Entra en Tràmits Gencat con certificado digital o idCAT Mòbil y elige esta prestación en la pestaña 1 del formulario.","También se puede presentar en un registro de la Generalitat, en Correos u otras oficinas de registro, con el modelo «Sol·licitud de prestacions socials i econòmiques per a persones amb discapacitat».","En Sant Boi te pueden ayudar en la Oficina d'Afers Socials i Famílies.","Se puede pedir en cualquier momento y no tiene tasa. La resolución tarda hasta 6 meses y, si no hay respuesta, se entiende estimada. El pago empieza el mes siguiente a la solicitud."],
+  need:["Más de 3 años, discapacidad igual o superior al 33 % y que se supere el baremo de movilidad","Residencia legal en España","Recursos por debajo del 70 % del IPREM anual (sube un 10 % por cada persona a cargo, sin pasar del IPREM)","No cobrar una prestación análoga de otro organismo","Documentos de representación y económicos (nóminas, declaraciones trimestrales si eres autónomo)"],
+  contact:["Oficina d'Afers Socials i Famílies: 93 654 36 11","Consultas por la «Bústia de contacte» de ovt.gencat.cat"],
+  links:[{t:"Subsidio de movilidad (Tràmits Gencat)",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/Subsidi-de-mobilitat-i-compensacio-per-despeses-de-transport-SMDT"}]},
+
+ {id:"pua",g:"otras",s:()=>"ask",t:"Ayudas PUA (productos de apoyo y adaptaciones)",org:"Departament de Drets Socials i Inclusió",
+  ex:["Adaptar el baño con silla de ducha y barras de pared.", "Cama articulada, grúa o arnés para levantar al niño en casa.", "Salvaescaleras o adaptaciones del hogar, y protecciones para la vivienda.", "Gafas, audífonos o un comunicador (para quien no habla).", "Sistemas de control del entorno y ropa adaptada.", "Adaptar el vehículo, y el transporte a atención temprana o al colegio.", "No aparecen en el listado oficial cosas como pañales, medicamentos o gastos corrientes."],
+  w:"Ayuda de la Generalitat para productos de apoyo, adaptación del vehículo o del hogar, comunicadores, audífonos, gafas, sillas, camas, transporte a atención temprana o a centros educativos, y 300 € al año para el mantenimiento de un perro de asistencia (cifras de 2021).",
+  steps:["Entra en la página de la PUA en Tràmits Gencat, que se actualizó el 3 de octubre de 2026.","Pulsa «Sol·licitar la prestació» con certificado digital o idCAT Mòbil.","En la misma página puedes aportar documentación, presentar alegaciones y justificar el gasto.","En Sant Boi te ayudan en la Oficina d'Afers Socials i Famílies."],
+  need:["Empadronamiento y residencia legal en Catalunya","Grado de discapacidad del 33 % o más, o haber pedido la valoración","La prestación cubre un porcentaje del coste (25 % a 100 % según tus ingresos) y se puede repetir pasados 4 años","Fechas y requisitos de este año: revisa la convocatoria vigente, porque los datos que he encontrado son de 2021"],
+  contact:["Oficina d'Afers Socials i Famílies: 93 654 36 11","Oficina de Atención Ciudadana, Pg. del Taulat 266-270, Barcelona: 93 483 10 00"],
+  links:[{t:"PUA (Tràmits Gencat)",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/Prestacio-datencio-social-a-les-persones-amb-discapacitat-PUA"}]},
+
+ {id:"socials",g:"otras",s:()=>"ok",t:"Servicios Sociales Básicos de Sant Boi",org:"Ajuntament de Sant Boi de Llobregat",
+  ex:["Pedir una primera cita para que os expliquen qué ayudas os tocan y os ayuden con los formularios."],
+  w:"Primera puerta para orientación, ayudas técnicas, prestaciones y recursos. Atienden por teléfono y presencialmente con cita previa, de lunes a viernes de 9 a 14 h. Cada centro atiende un distrito.",
+  steps:["Llama al centro de tu distrito y pide cita.","La Oficina de Suficiencia Material, en Cal Ninyo, asesora sobre ayudas y prestaciones sociales."],
+  need:["Certificado de discapacidad y DNI o NIE, para empezar"],
+  contact:["L'Olivera (Marianao), Pl. Montserrat Roig 1: 93 652 98 40","Can Massallera (Centre-Vinyets), C. Mallorca 30: 93 654 89 50","La Gralla (Camps Blancs-Casablanca), Pl. dels Gegants 1: 93 640 03 34","Casal Cooperativa (Cooperativa-Molí Nou), C. Pau Casals 7: 93 640 21 08 · 93 635 12 14","Cal Ninyo, C. Major 43: 93 635 12 20"],
+  links:[{t:"Servicios sociales (Ajuntament de Sant Boi)",u:"https://www.santboi.cat/ciutadania/serveis-socials"},SBG]},
+
+ {id:"cdiap",g:"otras",s:()=>"ok",t:"Atención temprana (CDIAP)",org:"CDIAP de Sant Boi",show:a=>a.edad==="u3"||a.edad==="3",
+  ex:["Terapias de estimulación y apoyo a la familia para un niño pequeño con retraso del desarrollo, gratis (pregunta por los plazos de espera)."],
+  w:"Servicio público y gratuito para niños de 0 a 6 años con trastornos del desarrollo o en riesgo de padecerlos.",
+  steps:["Llama al CDIAP para pedir la primera visita. También puede derivar el pediatra o la escuela infantil."],
+  need:["Menor de 0 a 6 años con un trastorno del desarrollo o riesgo de tenerlo"],
+  contact:["CDIAP, C. Bonaventura Calopa 9: 93 630 58 82 · cdiapsboi@cdiapsboi.cat"],links:[SBG]},
+
+ {id:"sumem",g:"otras",s:()=>"ok",t:"Sumem: ocio y talleres inclusivos",org:"Ajuntament de Sant Boi (Igualtat i Cohesió Social)",show:a=>a.edad==="4-11"||a.edad==="12-17",
+  ex:["Apuntar al niño a baile inclusivo, a una actividad multideportiva o a talleres de manualidades con otros niños."],
+  w:"Programa municipal de talleres de autonomía personal, actividad multideportiva, terapia con fisioterapeuta, baile inclusivo, club de lectura fácil y manualidades.",
+  steps:["Escribe o llama para saber las plazas y horarios disponibles."],
+  need:["Estar empadronado en Sant Boi","Certificado o tarjeta de discapacidad"],
+  contact:["Can Jordana, C. Ebre 27: 93 635 12 00, ext. 424","programadiscapacitats@santboi.cat"],
+  links:[{t:"Díptico del programa Sumem",u:"https://santboi.cat/Documents/Discapacitats/DipticSumem_2023.pdf"}]},
+
+ {id:"sirius",g:"otras",s:()=>"ask",t:"Ayudas técnicas y accesibilidad (Centre Sírius)",org:"Centre per a l'Autonomia Personal Sírius (Generalitat de Catalunya)",
+  ex:["Probar antes de comprar: ver una silla de ducha, una ayuda para vestirse o un comunicador, y decidir cuál os conviene antes de pedir la PUA."],
+  w:"Servicio público y gratuito de información y asesoramiento sobre productos de apoyo, accesibilidad de la vivienda y sistemas de comunicación alternativa. Atiende a personas con discapacidad, a sus familias y cuidadores y a profesionales. Es un servicio de orientación: no concede ayudas económicas, pero te enseña qué producto te conviene y cómo conseguirlo (por ejemplo, con la PUA).",
+  steps:["Llama al 93 483 84 18 (lunes a viernes, de 8:00 a 15:00 h) y explica la situación del menor y qué necesitas (silla, adaptaciones, comunicación...).","Si el menor tiene dificultades de habla o de acceso al ordenador, pide también información a la UTAC (Unidad de Técnicas Aumentativas de Comunicación): 638 76 75 15, también por WhatsApp.","Pregunta por la cita y por lo que debes llevar. Antes de ir, comprueba la dirección y el horario con el centro.","Con el asesoramiento, pide la ayuda económica que corresponda (por ejemplo, la PUA, en esta misma lista)."],
+  need:["Certificado de discapacidad (conviene llevarlo)","Informes médicos o de los profesionales que atienden al menor, si los hay"],
+  contact:["Sírius: 93 483 84 18 (L-V 8:00-15:00)","UTAC Sírius: 638 76 75 15 (WhatsApp) · utac.sirius.dretssocials@gencat.cat","Passeig del Taulat, 266-270, 08019 Barcelona (confirmar dirección y horario antes de ir)","En Sant Boi te orientan también en la Oficina d'Afers Socials i Famílies: 93 654 36 11"],
+  links:[{t:"Centre Sírius – Departament de Drets Socials i Inclusió",u:"https://dretssocials.gencat.cat/ca/ambits_tematics/accessibilitat/centre-autonomia-personal-sirius/"},{t:"UTAC (comunicación aumentativa)",u:"https://www.utac.cat"}]}
+];
+
+const app=document.getElementById("app");
+let ans={extra:[]}, step=0, done=false;
+let seen={};try{seen=JSON.parse(localStorage.getItem("ajudes-lo-tengo")||"{}")}catch(e){}
+
+const visibleQ=()=>Q.filter(q=>!q.showIf||q.showIf(ans));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function renderQ(){
+  const qs=visibleQ(), q=qs[step];
+  const cur=q.multi?(ans[q.id]||[]):ans[q.id];
+  const pct=Math.round(step/qs.length*100);
+  app.innerHTML=`<div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+  <section class="card q"><span class="eyebrow">Pregunta ${step+1} de ${qs.length}</span>
+  <h2 style="margin-top:6px">${esc(q.t)}</h2><p class="help">${esc(q.h)}</p>
+  <div class="opts">${q.o.map(([v,l,s])=>`<button class="opt" type="button" data-v="${v}" aria-pressed="${q.multi?cur.includes(v):cur===v}"><span><b>${esc(l)}</b>${s?`<small>${esc(s)}</small>`:""}</span></button>`).join("")}</div>
+  <div class="nav"><button class="btn" id="back" type="button" ${step===0?"disabled":""}>Atrás</button>
+  <button class="btn pri" id="next" type="button" ${(q.multi||cur)?"":"disabled"}>${step===qs.length-1?"Ver mis ayudas":"Siguiente"}</button></div></section>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const v=b.dataset.v;
+    if(q.multi){const l=ans[q.id]||[];ans[q.id]=l.includes(v)?l.filter(x=>x!==v):[...l,v];renderQ();}
+    else{ans[q.id]=v;const n=visibleQ();if(step<n.length-1){step++;renderQ();}else{renderQ();}}
+  });
+  document.getElementById("back").onclick=()=>{step--;renderQ()};
+  document.getElementById("next").onclick=()=>{if(step===visibleQ().length-1){done=true;renderR();}else{step++;renderQ();}};
+}
+
+const LAB={cert:{si:"Con certificado",tramite:"Certificado en trámite",no:"Sin certificado"},edad:{u3:"Menos de 3 años","3":"3 años","4-11":"4 a 11 años","12-17":"12 a 17 años"},
+  mov:{si:"Supera baremo de movilidad",no:"No supera baremo de movilidad",nose:"Baremo de movilidad por confirmar"},tipo:{pm:"",mono:"Familia monoparental"},num:{si:"Familia numerosa",tramite:"Familia numerosa en trámite",no:""}};
+
+function itemHTML(it){
+  const st=it.s(ans), note=it.note?it.note(ans):"", v=VIDEOS[it.id], d=!!seen[it.id], links=it.links||[];
+  const ex=it.ex&&it.ex.length?`<details class="dt" open><summary>Ejemplos del día a día</summary><ul>${it.ex.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
+  const ol=it.steps&&it.steps.length?`<details class="dt"><summary>Cómo pedirlo (${it.steps.length} ${it.steps.length===1?"paso":"pasos"})</summary><ol>${it.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></details>`:"";
+  const ul=it.need&&it.need.length?`<details class="dt"><summary>Qué necesitas</summary><ul>${it.need.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
+  const ct=it.contact&&it.contact.length?`<div class="meta"><div><span class="k">Contacto</span><span class="v">${it.contact.map(esc).join("<br>")}</span></div></div>`:"";
+  return `<article class="item ${d?"done":""}"><div class="ih"><h3>${esc(it.t)}</h3><span class="tag ${st}">${st==="ok"?"Te encaja":"Confirmar criterios"}</span></div>
+  <p class="w">${esc(it.w)}</p>${note?`<p>${esc(note)}</p>`:""}
+  <div class="meta"><div><span class="k">Dónde</span><span class="v">${esc(it.org)}</span></div></div>${ct}
+  ${ex}${ol}${ul}
+  ${links.length?`<div class="links"><span class="k">Leer más</span>${links.map(l=>`<a href="${esc(l.u)}" target="_blank" rel="noopener">${esc(l.t)} ↗</a>`).join("")}</div>`:""}
+  <div class="row">${v?`<a class="vid" href="${esc(v)}" target="_blank" rel="noopener">Ver vídeo guía</a>`:`<span class="vid off">Vídeo guía próximamente</span>`}
+  <label class="chk"><input type="checkbox" data-id="${it.id}" ${d?"checked":""}> Ya lo tenemos pedido</label></div></article>`;
+}
+
+function renderR(){
+  let list=ITEMS.filter(it=>!it.show||it.show(ans));
+  const noCert=ans.cert==="no";
+  if(noCert)list=list.filter(it=>(it.id==="acreditativa"||it.id==="grado"));
+  const chips=[LAB.cert[ans.cert],LAB.edad[ans.edad],LAB.mov[ans.mov],LAB.tipo[ans.tipo],LAB.num[ans.num]].filter(Boolean);
+  let html=`<div class="prog"><i style="width:100%"></i></div><h2 style="font-size:1.5rem">Tus ayudas</h2>
+  <div class="sum">${chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`;
+  if(noCert)html+=`<div class="notice">El primer paso es solicitar el certificado de discapacidad. Cuando lo tengas, vuelve a hacer el cuestionario y verás el resto de ayudas.</div>`;
+  else if(ans.cert==="tramite")html+=`<div class="notice">Mientras llega la resolución del grado de discapacidad no podrás pedir la mayoría. Ve preparando los documentos con esta lista.</div>`;
+  if(ans.mov==="nose")html+=`<div class="notice">Revisa la resolución del grado de discapacidad para saber si supera el baremo de movilidad. Si lo supera, aparecerán más ayudas de transporte y vehículo.</div>`;
+  const n=list.length, d=list.filter(i=>seen[i.id]).length;
+  html+=`<p class="lead" id="count">${n} ayudas encontradas · ${d} ya pedidas</p>`;
+  Object.keys(G).forEach(g=>{const l=list.filter(i=>i.g===g);if(!l.length)return;
+    html+=`<section class="grp"><h2>${G[g]}</h2><div class="items">${l.map(itemHTML).join("")}</div></section>`;});
+  html+=`<div class="nav"><button class="btn" id="redo" type="button">Cambiar respuestas</button></div>`;
+  app.innerHTML=html;
+  app.querySelectorAll(".chk input").forEach(c=>c.onchange=()=>{
+    seen[c.dataset.id]=c.checked;try{localStorage.setItem("ajudes-lo-tengo",JSON.stringify(seen))}catch(e){}
+    c.closest(".item").classList.toggle("done",c.checked);
+    document.getElementById("count").textContent=`${n} ayudas encontradas · ${list.filter(i=>seen[i.id]).length} ya pedidas`;
+  });
+  document.getElementById("redo").onclick=()=>{done=false;step=0;renderQ();window.scrollTo(0,0);};
+  window.scrollTo(0,0);
+}
+renderQ();
+</script>
