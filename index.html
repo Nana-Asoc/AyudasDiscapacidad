@@ -390,12 +390,14 @@ function renderQ(){
   <button class="btn pri" id="next" type="button" ${(q.multi||cur)?"":"disabled"}>${step===qs.length-1?"Ver mis ayudas":"Siguiente"}</button></div></section>`;
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     const v=b.dataset.v;
-    if(q.multi){const l=ans[q.id]||[];ans[q.id]=l.includes(v)?l.filter(x=>x!==v):[...l,v];renderQ();}
-    else{ans[q.id]=v;const n=visibleQ();if(step<n.length-1){step++;renderQ();}else{renderQ();}}
+    if(q.multi){const l=ans[q.id]||[];ans[q.id]=l.includes(v)?l.filter(x=>x!==v):[...l,v];}
+    else ans[q.id]=v;
+    renderQ();app.querySelector(`.opt[data-v="${v}"]`).focus();
   });
-  document.getElementById("back").onclick=()=>{step--;renderQ()};
-  document.getElementById("next").onclick=()=>{if(step===visibleQ().length-1){done=true;renderR();}else{step++;renderQ();}};
+  document.getElementById("back").onclick=()=>{step--;goQ()};
+  document.getElementById("next").onclick=()=>{if(step===visibleQ().length-1){done=true;renderR();}else{step++;goQ();}};
 }
+function goQ(){renderQ();const top=app.getBoundingClientRect().top;if(top<0)app.scrollIntoView({block:"start"});}
 
 const LAB={cert:{si:"Con certificado",tramite:"Certificado en trámite",no:"Sin certificado"},edad:{u3:"Menos de 3 años","3":"3 años","4-11":"4 a 11 años","12-17":"12 a 17 años"},
   mov:{si:"Supera baremo de movilidad",no:"No supera baremo de movilidad",nose:"Baremo de movilidad por confirmar"},tipo:{pm:"",mono:"Familia monoparental"},num:{si:"Familia numerosa",tramite:"Familia numerosa en trámite",no:""}};
