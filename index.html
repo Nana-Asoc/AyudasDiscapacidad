@@ -68,6 +68,8 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 .links a{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 .dt{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;font-size:.92rem}
 .dt summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
+.qi{margin-top:12px}
+.qi p{margin:6px 0 0}
 .dt ol,.dt ul{margin:6px 0 2px;padding-left:20px;display:grid;gap:6px}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
 .vid{font:inherit;font-weight:600;font-size:.9rem;text-decoration:none;border-radius:8px;padding:8px 14px;background:var(--accent);color:var(--accent-ink);display:inline-block}
@@ -100,6 +102,36 @@ const VIDEOS = {
   matriculacion:"", circulacion:"", blanca:"", iva:"", aparcamiento:"", reserva:"", visual:"",
   titulo:"", ibi:"", sirius:"", educativo:"", pua:"", smdt:"", perro:"", inserccion:"", vivienda:"", bono:"", recurso:""
 };
+
+/* Explicación desplegable de cada pregunta: s = texto del enlace, p = párrafos. */
+const INFO={
+ cert:{s:"¿Qué es el certificado de discapacidad?",p:[
+   "Es la resolución oficial que reconoce el grado de discapacidad del menor, en porcentaje. La emite el CAD (Centre d'Atenció a Persones amb Discapacitat) de la Generalitat después de valorar al menor con sus informes médicos.",
+   "A partir del 33 % da acceso a la mayoría de las ayudas. Si ya lo tenéis, lo veréis en la carta de resolución del grado o en la tarjeta acreditativa de la discapacidad."]},
+ mov:{s:"¿Qué es el baremo de movilidad?",p:[
+   "Es una valoración aparte que hace el CAD, normalmente al mismo tiempo que el grado, para saber si el menor tiene muchas dificultades para moverse o para usar el transporte público (autobús, metro…).",
+   "No depende del porcentaje: un menor puede tener un grado alto y no superar el baremo, o al revés.",
+   "Dónde mirarlo: en la resolución del grado de discapacidad. Suele aparecer como «barem de mobilitat», «mobilitat reduïda» o «dificultats de mobilitat», con un resultado como sí/no, positivo/negativo o supera/no supera.",
+   "Si no lo encuentras, elige «No lo sé todavía» y pregúntalo en el CAD o en la Oficina d'Afers Socials i Famílies (93 654 36 11)."]},
+ apar:{s:"¿Qué se considera un aparato técnico para las funciones vitales?",p:[
+   "Son aparatos sin los que el menor no puede mantener funciones básicas como respirar o alimentarse, y que necesita de forma continuada. Por ejemplo: respirador, oxígeno, alimentación por sonda o bomba de nutrición.",
+   "Lo acredita un informe del CAD Infantil (93 458 99 08)."]},
+ vis:{s:"¿Qué significa una agudeza visual de 0,1?",p:[
+   "Quiere decir que, incluso con gafas o lentillas, el menor ve con el ojo que mejor ve un 10 % o menos de lo normal. También cuenta tener el campo de visión muy reducido (10 grados o menos).",
+   "Lo indican los informes del oftalmólogo. Si la resolución del grado recoge una discapacidad visual del 75 % o más, también cumple."]},
+ tipo:{s:"¿Qué cuenta como familia monoparental?",p:[
+   "En general, cuando una sola persona adulta (madre, padre, tutor o tutora) tiene a su cargo al menor y no convive con otra pareja.",
+   "Hay otros casos que también pueden contar, como algunas separaciones en las que no se recibe pensión de alimentos. Se revisan al pedir el título de familia monoparental."]},
+ num:{s:"¿Podemos ser familia numerosa?",p:[
+   "Normalmente hacen falta 3 hijos o hijas, pero basta con 2 si uno de ellos tiene una discapacidad del 33 % o más.",
+   "Si tenéis 2 hijos y uno tiene el certificado, es probable que podáis pedir el título aunque todavía no lo tengáis."]},
+ veh:{s:"¿Qué vehículo cuenta?",p:[
+   "Puede ser un coche que ya tenéis o uno que pensáis comprar, a nombre del menor o de la familia, siempre que se use para sus desplazamientos."]},
+ cot:{s:"¿Quién cuenta y quién no?",p:[
+   "Cuenta: trabajar con contrato o como autónomo dado de alta, cobrar el paro (prestación o subsidio) o cobrar una pensión de la Seguridad Social o de Clases Pasivas.",
+   "No cuenta: estar apuntado al paro sin cobrar nada, o trabajar sin estar dado de alta."]}
+};
+let infoOpen={};
 
 const Q = [
  {id:"cert",t:"¿Tiene ya el certificado de discapacidad?",h:"Es el reconocimiento de un grado igual o superior al 33 %. Casi todas las ayudas parten de él.",o:[
@@ -385,9 +417,11 @@ function renderQ(){
   app.innerHTML=`<div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
   <section class="card q"><span class="eyebrow">Pregunta ${step+1} de ${qs.length}</span>
   <h2 style="margin-top:6px">${esc(q.t)}</h2><p class="help">${esc(q.h)}</p>
+  ${INFO[q.id]?`<details class="dt qi" ${infoOpen[q.id]?"open":""}><summary>${esc(INFO[q.id].s)}</summary>${INFO[q.id].p.map(x=>`<p>${esc(x)}</p>`).join("")}</details>`:""}
   <div class="opts">${q.o.map(([v,l,s])=>`<button class="opt" type="button" data-v="${v}" aria-pressed="${q.multi?cur.includes(v):cur===v}"><span><b>${esc(l)}</b>${s?`<small>${esc(s)}</small>`:""}</span></button>`).join("")}</div>
   <div class="nav"><button class="btn" id="back" type="button" ${step===0?"disabled":""}>Atrás</button>
   <button class="btn pri" id="next" type="button" ${(q.multi||cur)?"":"disabled"}>${step===qs.length-1?"Ver mis ayudas":"Siguiente"}</button></div></section>`;
+  const qi=app.querySelector(".qi");if(qi)qi.ontoggle=()=>{infoOpen[q.id]=qi.open};
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     const v=b.dataset.v;
     if(q.multi){const l=ans[q.id]||[];ans[q.id]=l.includes(v)?l.filter(x=>x!==v):[...l,v];}
