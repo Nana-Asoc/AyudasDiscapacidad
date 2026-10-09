@@ -133,14 +133,17 @@ const INFO={
 };
 let infoOpen={};
 
+/* Supera el baremo de movilidad, o aún no lo sabe (las ayudas salen como «Confirmar criterios»). */
+const MOV=a=>a.mov==="si"||a.mov==="nose";
+
 const Q = [
  {id:"cert",t:"¿Tiene ya el certificado de discapacidad?",h:"Es el reconocimiento de un grado igual o superior al 33 %. Casi todas las ayudas parten de él.",o:[
    ["si","Sí, ya lo tiene","Grado igual o superior al 33 %"],["tramite","Lo hemos pedido","Estamos esperando la resolución"],["no","Todavía no lo hemos pedido",""]]},
  {id:"edad",t:"¿Qué edad tiene?",h:"Algunas ayudas cambian según la edad.",o:[
-   ["u3","Menos de 3 años",""],["3","3 años",""],["4-11","De 4 a 11 años",""],["12-17","De 12 a 17 años",""]]},
+   ["u3","Menos de 3 años",""],["3","3 años",""],["4-5","De 4 a 5 años",""],["6-11","De 6 a 11 años",""],["12-17","De 12 a 17 años",""]]},
  {id:"mov",t:"¿Supera el baremo de movilidad?",h:"Aparece en la resolución del grado de discapacidad. Si no lo sabes, elige la última opción y míralo en el documento.",o:[
    ["si","Sí, lo supera",""],["no","No lo supera",""],["nose","No lo sé todavía",""]]},
- {id:"apar",t:"¿Depende de aparatos técnicos para las funciones vitales de forma continuada?",h:"Por ejemplo respirador o alimentación por sonda. Solo importa en menores de 3 años con pluridiscapacidad.",showIf:a=>a.edad==="u3",o:[
+ {id:"apar",t:"¿Depende de aparatos técnicos para las funciones vitales de forma continuada?",h:"Por ejemplo respirador o alimentación por sonda. Solo importa hasta los 3 años, en menores con pluridiscapacidad.",showIf:a=>a.edad==="u3"||a.edad==="3",o:[
    ["si","Sí",""],["no","No",""]]},
  {id:"vis",t:"¿Tiene una agudeza visual de 0,1 o menos, o una discapacidad visual igual o mayor al 75 %?",h:"Da acceso a la tarjeta de aparcamiento aunque no se supere el baremo de movilidad.",o:[
    ["si","Sí",""],["no","No",""]]},
@@ -217,17 +220,17 @@ const ITEMS=[
   contact:["AMB: 900 70 00 77 (lunes a viernes, 9-18 h)",EMAP],
   links:[{t:"Solicitud de la T-metropolitana rosa (AMB)",u:"https://www.amb.cat/web/amb/seu-electronica/tramits/detall/-/tramit/sol-licitud-de-la-t-metropolitana-targeta-rosa/17176884/11696"},AMBT]},
 
- {id:"acompanante",g:"mov",s:()=>"ok",t:"Pase de acompañante (T-metropolitana)",org:"Área Metropolitana de Barcelona (AMB)",
-  show:a=>a.edad==="4-11"||(a.edad==="12-17"&&a.mov==="si"),
+ {id:"acompanante",g:"mov",s:()=>"ask",t:"Pase de acompañante (T-metropolitana)",org:"Área Metropolitana de Barcelona (AMB)",
+  show:a=>["4-5","6-11","12-17"].includes(a.edad),
   ex:["Un adulto acompaña al niño al cole o a terapia sin pagar billete, usando el pase del menor.", "No vale en la red de FGC."],
-  w:"El acompañante viaja gratis. De 4 a 12 años se concede sin baremo. A partir de 12 años, solo si se supera el baremo de movilidad. Se emite a nombre del menor y la usa quien lo acompaña. No vale en la red de FGC.",
+  w:"El acompañante viaja gratis. Es para mayores de 4 años que necesitan ir acompañados en el transporte público, y lo que se pide es el certificado de necesidad de acompañante, no el baremo de movilidad. Se emite a nombre del menor y la usa quien lo acompaña. No vale en la red de FGC.",
   steps:["Consigue el certificado que acredita que el menor necesita acompañante en el transporte público.","Solicita el pase en la sede electrónica de la AMB (T-metropolitana, pase de acompañante).","Recibes la tarjeta en casa. En 2024 costaba 4,50 € la tarjeta más una tasa anual de 5,90 €: confirma el precio actual en la AMB."],
   need:["El menor debe tener más de 4 años","Estar empadronado en un municipio del AMB","Certificado de necesidad de acompañante (lo emite el Departament de Drets Socials)","DNI o NIE del menor, que se puede pedir en una inspección"],
   contact:["AMB: 900 70 00 77 (lunes a viernes, 9-18 h)"],
   links:[{t:"Pase de acompañante (TMB)",u:"https://www.tmb.cat/en/barcelona-fares-metro-bus/t-metropolitana-companion-pass"},AMBT]},
 
- {id:"blanca",g:"mov",s:()=>"ask",t:"Transporte adaptado (Sant Boi y Baix Llobregat)",org:"Ajuntament de Sant Boi de Llobregat y Consell Comarcal del Baix Llobregat",
-  show:a=>a.mov==="si",
+ {id:"blanca",g:"mov",bm:true,s:()=>"ask",t:"Transporte adaptado (Sant Boi y Baix Llobregat)",org:"Ajuntament de Sant Boi de Llobregat y Consell Comarcal del Baix Llobregat",
+  show:a=>MOV(a),
   ex:["Ir a una cita con un especialista o a terapia en un vehículo adaptado, con la silla de ruedas, y un adulto acompañante.", "Hay que confirmar con el Ayuntamiento que el servicio acepta menores con acompañante."],
   w:"Hay dos servicios distintos. 1) Transporte adaptado «fijo» (rutas a centros) y «a la demanda» (desplazamientos puntuales: gestiones, compras, ocio), del Consell Comarcal del Baix Llobregat, que se pide a través de los servicios sociales del municipio. Un menor puede usarlo si viaja con su propia persona acompañante (en las rutas fijas hay una figura de acompañante). 2) El transporte «puerta a puerta» entre municipios que publica el Ayuntamiento de Sant Boi, que es solo para mayores de 18 años y no sirve para menores. Que Sant Boi tenga plazas o esté dentro del servicio comarcal conviene confirmarlo en el Ayuntamiento, porque su ficha no menciona a los menores.",
   steps:["Llama a la Oficina d'Afers Socials i Famílies (93 654 36 11) o a la eMAP (93 635 12 12) y pregunta por el transporte adaptado para un menor con acompañante.","Si te lo confirman, inicia el trámite «Transport adaptat fix» en la sede electrónica de Sant Boi o con cita previa en la eMAP.","Aporta el certificado de discapacidad con baremo de movilidad positivo y el informe médico (silla de ruedas, muletas o bastones, insuficiencia respiratoria o cardíaca grave, o trastorno grave de conducta que impida usar el transporte público).","Una vez dado de alta, en el servicio a la demanda se reserva hora y lugar llamando directamente a la empresa transportista.","No pidas el «puerta a puerta»: es solo para mayores de 18 años."],
@@ -235,14 +238,14 @@ const ITEMS=[
   contact:[EMAP,"Consell Comarcal del Baix Llobregat – transporte adaptado: 93 685 24 00 · transportadaptat@elbaixllobregat.cat","Oficina d'Afers Socials i Famílies: 93 654 36 11"],
   links:[{t:"Servei de Transport Adaptat (Consell Comarcal del Baix Llobregat)",u:"https://www.elbaixllobregat.cat/serveitransportadaptat"},{t:"Transporte adaptado fijo (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=2104"},{t:"Trámites destacados para personas con discapacidad (Sant Boi)",u:"https://santboi.cat/ciutadania/persones-amb-discapacitat/tramits-destacats"},SBD]},
 
- {id:"aparcamiento",g:"mov",s:a=>a.edad==="3"?"ask":"ok",t:"Tarjeta de aparcamiento para personas con discapacidad",org:"Ajuntament de Sant Boi de Llobregat",
-  show:a=>(a.edad==="u3"&&a.apar==="si")||(a.edad!=="u3"&&a.mov==="si"),
+ {id:"aparcamiento",g:"mov",bm:true,s:a=>a.edad==="3"?"ask":"ok",t:"Tarjeta de aparcamiento para personas con discapacidad",org:"Ajuntament de Sant Boi de Llobregat",
+  show:a=>((a.edad==="u3"||a.edad==="3")&&a.apar==="si")||(a.edad!=="u3"&&MOV(a)),
   ex:["Aparcar o parar lo más cerca posible de la puerta del médico, del hospital o de la escuela.", "Bajar con calma la silla de ruedas, sin tener que aparcar lejos."],
   w:"Permite aparcar o parar lo más cerca posible del punto de acceso o destino. Es personal e intransferible y vale en toda Catalunya, España y la UE. El menor figura como titular «no conductor».",
   steps:["Entra en la ficha del trámite «Targeta d'aparcament» en la sede electrónica de Sant Boi y rellena la solicitud.","Si lo prefieres, pídelo en la eMAP con cita previa.","Aporta la documentación.","Coloca siempre la cara delantera de la tarjeta visible en el coche donde viaja el menor.","En caso de pérdida o robo, pide un duplicado con copia de la denuncia."],
   need:["Resolución del grado de discapacidad con baremo de movilidad positivo, o la tarjeta acreditativa","Más de 3 años. A los 3 años o menos solo con pluridiscapacidad que dependa de aparatos técnicos, con certificado del CAD Infantil (Av. del Paral·lel 145, 93 458 99 08)","DNI, NIE o pasaporte del menor","Documento de representación legal si no lo pide el padre o la madre","Fotos y resto de documentos: confirma la lista exacta en la ficha de Sant Boi"],
   contact:[EMAP],
-  note:a=>a.edad==="3"?"Con 3 años justos, confirma con el ayuntamiento si ya te corresponde.":"",
+  note:a=>a.edad==="3"?"Con 3 años las normas no coinciden: unas hablan de «menores de 3 años» y otras de «3 años o menos» para el caso de los aparatos técnicos. Confírmalo con el ayuntamiento.":"",
   links:[{t:"Tarjeta de aparcamiento (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=1767"},SBD]},
 
  {id:"visual",g:"mov",s:()=>"ok",t:"Tarjeta de aparcamiento por discapacidad visual",org:"Ajuntament de Sant Boi de Llobregat",show:a=>a.vis==="si",
@@ -253,7 +256,7 @@ const ITEMS=[
   contact:["CAD Infantil: 93 458 99 08",EMAP],
   links:[{t:"Tarjeta de aparcamiento (sede de Sant Boi)",u:"https://tramits.santboi.cat/Ciutadania/DetallTramit.aspx?Cercador=True&IdTramit=1767"}]},
 
- {id:"reserva",g:"mov",s:()=>"ask",t:"Reserva de plaza de aparcamiento",org:"Ajuntament de Sant Boi de Llobregat",show:a=>a.mov==="si",
+ {id:"reserva",g:"mov",bm:true,s:()=>"ask",t:"Reserva de plaza de aparcamiento",org:"Ajuntament de Sant Boi de Llobregat",show:a=>MOV(a),
   ex:["Tener una plaza reservada cerca de casa, en la calle, en lugar de dar vueltas con el niño y la silla.", "Solo si no tenéis garaje propio ni alquilado."],
   w:"Espacio reservado en la vía pública, lo más cerca posible del domicilio, del trabajo o del centro de estudios. Hay dos modalidades: titular conductor y titular no conductor.",
   steps:["Primero consigue la tarjeta de aparcamiento.","Entra en la ficha del trámite «Reserva de plaça d'aparcament» en la sede electrónica de Sant Boi y presenta la solicitud.","Para ayuda con la solicitud, acude a la eMAP con cita previa."],
@@ -277,7 +280,7 @@ const ITEMS=[
   contact:[EMAP],
   links:[{t:"Ordenanzas fiscales de Sant Boi",u:"https://seuelectronica.santboi.cat/Publi160.nsf/ca-VistaWeb-BASE?ReadForm&Clau=OFiscals&Idioma=ca&Seu=S"}]},
 
- {id:"iva",g:"veh",s:()=>"ok",t:"IVA del 4 % en la compra del vehículo",org:"Agencia Tributaria (AEAT)",show:a=>a.veh==="si"&&a.mov==="si",
+ {id:"iva",g:"veh",bm:true,s:()=>"ok",t:"IVA del 4 % en la compra del vehículo",org:"Agencia Tributaria (AEAT)",show:a=>a.veh==="si"&&MOV(a),
   ex:["Comprar un coche pagando el 4 % de IVA en vez del 21 %. En un coche de 20.000 € sin IVA, el IVA baja de 4.200 € a 800 €."],
   w:"IVA del 4 % en vez del 21 % al comprar un vehículo que transporte habitualmente a una persona con movilidad reducida, sea quien sea el conductor.",
   steps:["Antes de comprar, pide el «Reconocimiento del derecho» en la sede electrónica de la AEAT.","Con el reconocimiento, compra el vehículo con IVA del 4 %.","Si el reconocimiento llega después de comprar, pide al concesionario una factura rectificativa o presenta un escrito a la AEAT con la factura."],
@@ -355,7 +358,8 @@ const ITEMS=[
   need:["Residencia legal y empadronamiento en Catalunya","Grado de discapacidad del 33 % o más y resolución de dependencia","Dictamen de orientación del EVO","DNI vigente, informes médicos y psicológicos actualizados"],
   contact:["Cal Ninyo (primera acogida, dependencia): 93 635 12 20","Oficina d'Afers Socials i Famílies: 93 654 36 11","Departament de Drets Socials, Pg. del Taulat 266-270, Barcelona: 93 483 10 00"],links:[SBG]},
 
- {id:"smdt",g:"dinero",s:a=>a.edad==="u3"?"ask":"ok",t:"Subsidio de movilidad y compensación por gastos de transporte",org:"Departament de Drets Socials i Inclusió",show:a=>a.mov==="si"&&a.edad!=="u3",
+ {id:"smdt",g:"dinero",bm:true,s:a=>a.edad==="3"?"ask":"ok",t:"Subsidio de movilidad y compensación por gastos de transporte",org:"Departament de Drets Socials i Inclusió",show:a=>MOV(a)&&a.edad!=="u3",
+  note:a=>a.edad==="3"?"Hay que ser mayor de 3 años: si acaba de cumplirlos, confirma si ya puede pedirlo.":"",
   ex:["Un ingreso periódico para pagar taxis o transporte privado cuando el menor no puede usar el bus o el metro. Solo desde los 3 años y con ingresos bajos."],
   w:"Prestación económica periódica para cubrir desplazamientos de personas con discapacidad que tienen graves dificultades para usar el transporte público. Procede de la LISMI.",
   steps:["Entra en Tràmits Gencat con certificado digital o idCAT Mòbil y elige esta prestación en la pestaña 1 del formulario.","También se puede presentar en un registro de la Generalitat, en Correos u otras oficinas de registro, con el modelo «Sol·licitud de prestacions socials i econòmiques per a persones amb discapacitat».","En Sant Boi te pueden ayudar en la Oficina d'Afers Socials i Famílies.","Se puede pedir en cualquier momento y no tiene tasa. La resolución tarda hasta 6 meses y, si no hay respuesta, se entiende estimada. El pago empieza el mes siguiente a la solicitud."],
@@ -379,14 +383,14 @@ const ITEMS=[
   contact:["L'Olivera (Marianao), Pl. Montserrat Roig 1: 93 652 98 40","Can Massallera (Centre-Vinyets), C. Mallorca 30: 93 654 89 50","La Gralla (Camps Blancs-Casablanca), Pl. dels Gegants 1: 93 640 03 34","Casal Cooperativa (Cooperativa-Molí Nou), C. Pau Casals 7: 93 640 21 08 · 93 635 12 14","Cal Ninyo, C. Major 43: 93 635 12 20"],
   links:[{t:"Servicios sociales (Ajuntament de Sant Boi)",u:"https://www.santboi.cat/ciutadania/serveis-socials"},SBG]},
 
- {id:"cdiap",g:"otras",s:()=>"ok",t:"Atención temprana (CDIAP)",org:"CDIAP de Sant Boi",show:a=>a.edad==="u3"||a.edad==="3",
+ {id:"cdiap",g:"otras",s:()=>"ok",t:"Atención temprana (CDIAP)",org:"CDIAP de Sant Boi",show:a=>["u3","3","4-5"].includes(a.edad),
   ex:["Terapias de estimulación y apoyo a la familia para un niño pequeño con retraso del desarrollo, gratis (pregunta por los plazos de espera)."],
   w:"Servicio público y gratuito para niños de 0 a 6 años con trastornos del desarrollo o en riesgo de padecerlos.",
   steps:["Llama al CDIAP para pedir la primera visita. También puede derivar el pediatra o la escuela infantil."],
   need:["Menor de 0 a 6 años con un trastorno del desarrollo o riesgo de tenerlo"],
   contact:["CDIAP, C. Bonaventura Calopa 9: 93 630 58 82 · cdiapsboi@cdiapsboi.cat"],links:[SBG]},
 
- {id:"sumem",g:"otras",s:()=>"ok",t:"Sumem: ocio y talleres inclusivos",org:"Ajuntament de Sant Boi (Igualtat i Cohesió Social)",show:a=>a.edad==="4-11"||a.edad==="12-17",
+ {id:"sumem",g:"otras",s:()=>"ok",t:"Sumem: ocio y talleres inclusivos",org:"Ajuntament de Sant Boi (Igualtat i Cohesió Social)",show:a=>["4-5","6-11","12-17"].includes(a.edad),
   ex:["Apuntar al niño a baile inclusivo, a una actividad multideportiva o a talleres de manualidades con otros niños."],
   w:"Programa municipal de talleres de autonomía personal, actividad multideportiva, terapia con fisioterapeuta, baile inclusivo, club de lectura fácil y manualidades.",
   steps:["Escribe o llama para saber las plazas y horarios disponibles."],
@@ -433,11 +437,11 @@ function renderQ(){
 }
 function goQ(){renderQ();const top=app.getBoundingClientRect().top;if(top<0)app.scrollIntoView({block:"start"});}
 
-const LAB={cert:{si:"Con certificado",tramite:"Certificado en trámite",no:"Sin certificado"},edad:{u3:"Menos de 3 años","3":"3 años","4-11":"4 a 11 años","12-17":"12 a 17 años"},
+const LAB={cert:{si:"Con certificado",tramite:"Certificado en trámite",no:"Sin certificado"},edad:{u3:"Menos de 3 años","3":"3 años","4-5":"4 a 5 años","6-11":"6 a 11 años","12-17":"12 a 17 años"},
   mov:{si:"Supera baremo de movilidad",no:"No supera baremo de movilidad",nose:"Baremo de movilidad por confirmar"},tipo:{pm:"",mono:"Familia monoparental"},num:{si:"Familia numerosa",tramite:"Familia numerosa en trámite",no:""}};
 
 function itemHTML(it){
-  const st=it.s(ans), note=it.note?it.note(ans):"", v=VIDEOS[it.id], d=!!seen[it.id], links=it.links||[];
+  const nb=it.bm&&ans.mov==="nose", st=nb?"ask":it.s(ans), note=[it.note?it.note(ans):"",nb?"Depende de que supere el baremo de movilidad: compruébalo en la resolución del grado.":""].filter(Boolean).join(" "), v=VIDEOS[it.id], d=!!seen[it.id], links=it.links||[];
   const ex=it.ex&&it.ex.length?`<details class="dt" open><summary>Ejemplos del día a día</summary><ul>${it.ex.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
   const ol=it.steps&&it.steps.length?`<details class="dt"><summary>Cómo pedirlo (${it.steps.length} ${it.steps.length===1?"paso":"pasos"})</summary><ol>${it.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></details>`:"";
   const ul=it.need&&it.need.length?`<details class="dt"><summary>Qué necesitas</summary><ul>${it.need.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
@@ -460,7 +464,7 @@ function renderR(){
   <div class="sum">${chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`;
   if(noCert)html+=`<div class="notice">El primer paso es solicitar el certificado de discapacidad. Cuando lo tengas, vuelve a hacer el cuestionario y verás el resto de ayudas.</div>`;
   else if(ans.cert==="tramite")html+=`<div class="notice">Mientras llega la resolución del grado de discapacidad no podrás pedir la mayoría. Ve preparando los documentos con esta lista.</div>`;
-  if(ans.mov==="nose")html+=`<div class="notice">Revisa la resolución del grado de discapacidad para saber si supera el baremo de movilidad. Si lo supera, aparecerán más ayudas de transporte y vehículo.</div>`;
+  if(ans.mov==="nose")html+=`<div class="notice">Revisa la resolución del grado de discapacidad para saber si supera el baremo de movilidad. Las ayudas que dependen de él aparecen marcadas como «Confirmar criterios».</div>`;
   const n=list.length, d=list.filter(i=>seen[i.id]).length;
   html+=`<p class="lead" id="count">${n} ayudas encontradas · ${d} ya pedidas</p>`;
   Object.keys(G).forEach(g=>{const l=list.filter(i=>i.g===g);if(!l.length)return;
