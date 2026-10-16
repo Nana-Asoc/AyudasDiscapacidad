@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Guía orientativa de ayudas para menores con discapacidad en Sant Boi de Llobregat">
+<meta name="description" content="Guía orientativa de ayudas para personas con discapacidad en Sant Boi de Llobregat">
 <title>Ayudas Discapacidad</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap">
 <style>
@@ -40,6 +40,13 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--surface);box-shadow:inset 0 0 0 1px var(--accent)}
 .opt b{display:block;font-weight:600}
 .opt small{display:block;color:var(--muted);font-size:.88rem}
+.opt.go{align-items:center}
+.opt.go>span{flex:1}
+.opt.go>.ico,.opt.go>.arr{flex:none}
+.opt .ico{font-size:1.6rem;line-height:1}
+.opt .arr{color:var(--accent);font-weight:700;font-size:1.2rem}
+.nw{white-space:nowrap}
+.soon{margin:10px 0 0;padding-left:20px;display:grid;gap:4px}
 .nav{display:flex;gap:10px;justify-content:space-between;margin-top:20px;flex-wrap:wrap}
 .btn{font:inherit;font-weight:600;border-radius:10px;padding:11px 18px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 .btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -85,8 +92,8 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 <body>
 <div class="wrap">
   <header class="top">
-    <span class="eyebrow">Menores de 18 años · Sant Boi de Llobregat</span>
-    <h1>¿A qué ayudas tiene <span class="hi">derecho</span> tu hijo o hija?</h1>
+    <span class="eyebrow" id="eb">Sant Boi de Llobregat</span>
+    <h1 id="h1">¿A qué ayudas tenéis <span class="hi">derecho</span>?</h1>
     <p class="lead">Responde unas preguntas y verás las ayudas que encajan, dónde se piden y, cuando esté disponible, un vídeo que lo explica paso a paso.</p>
     <div class="notice"><strong>Aviso:</strong> esta web es una guía orientativa, revisada en octubre de 2026. No es una web oficial ni sustituye el asesoramiento de la Administración. Los requisitos, importes, plazos, teléfonos y direcciones pueden cambiar o contener errores: confirma siempre en el organismo oficial antes de hacer un trámite.</div>
   </header>
@@ -423,7 +430,7 @@ function renderQ(){
   <h2 style="margin-top:6px">${esc(q.t)}</h2><p class="help">${esc(q.h)}</p>
   ${INFO[q.id]?`<details class="dt qi" ${infoOpen[q.id]?"open":""}><summary>${esc(INFO[q.id].s)}</summary>${INFO[q.id].p.map(x=>`<p>${esc(x)}</p>`).join("")}</details>`:""}
   <div class="opts">${q.o.map(([v,l,s])=>`<button class="opt" type="button" data-v="${v}" aria-pressed="${q.multi?cur.includes(v):cur===v}"><span><b>${esc(l)}</b>${s?`<small>${esc(s)}</small>`:""}</span></button>`).join("")}</div>
-  <div class="nav"><button class="btn" id="back" type="button" ${step===0?"disabled":""}>Atrás</button>
+  <div class="nav"><button class="btn" id="back" type="button">Atrás</button>
   <button class="btn pri" id="next" type="button" ${(q.multi||cur)?"":"disabled"}>${step===qs.length-1?"Ver mis ayudas":"Siguiente"}</button></div></section>`;
   const qi=app.querySelector(".qi");if(qi)qi.ontoggle=()=>{infoOpen[q.id]=qi.open};
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
@@ -432,7 +439,7 @@ function renderQ(){
     else ans[q.id]=v;
     renderQ();app.querySelector(`.opt[data-v="${v}"]`).focus();
   });
-  document.getElementById("back").onclick=()=>{step--;goQ()};
+  document.getElementById("back").onclick=()=>{if(step===0)renderHome();else{step--;goQ();}};
   document.getElementById("next").onclick=()=>{if(step===visibleQ().length-1){done=true;renderR();}else{step++;goQ();}};
 }
 function goQ(){renderQ();const top=app.getBoundingClientRect().top;if(top<0)app.scrollIntoView({block:"start"});}
@@ -469,17 +476,50 @@ function renderR(){
   html+=`<p class="lead" id="count">${n} ayudas encontradas · ${d} ya pedidas</p>`;
   Object.keys(G).forEach(g=>{const l=list.filter(i=>i.g===g);if(!l.length)return;
     html+=`<section class="grp"><h2>${G[g]}</h2><div class="items">${l.map(itemHTML).join("")}</div></section>`;});
-  html+=`<div class="nav"><button class="btn" id="redo" type="button">Cambiar respuestas</button></div>`;
+  html+=`<div class="nav"><button class="btn" id="redo" type="button">Cambiar respuestas</button><button class="btn" id="home" type="button">Volver al inicio</button></div>`;
   app.innerHTML=html;
   app.querySelectorAll(".chk input").forEach(c=>c.onchange=()=>{
     seen[c.dataset.id]=c.checked;try{localStorage.setItem("ajudes-lo-tengo",JSON.stringify(seen))}catch(e){}
     c.closest(".item").classList.toggle("done",c.checked);
     document.getElementById("count").textContent=`${n} ayudas encontradas · ${list.filter(i=>seen[i.id]).length} ya pedidas`;
   });
+  document.getElementById("home").onclick=renderHome;
   document.getElementById("redo").onclick=()=>{done=false;step=0;renderQ();window.scrollTo(0,0);};
   window.scrollTo(0,0);
 }
-renderQ();
+/* ===== Pantalla de inicio: menores o personas adultas ===== */
+const HEAD={
+  home:["Sant Boi de Llobregat",'¿A qué ayudas tenéis <span class="hi">derecho</span>?'],
+  men:["Menores de 18 años · Sant Boi de Llobregat",'¿A qué ayudas tiene <span class="hi">derecho</span> tu hijo o hija?'],
+  adu:["Personas adultas · Sant Boi de Llobregat",'¿A qué ayudas tiene <span class="hi">derecho</span> una persona adulta?']};
+function setHead(m){document.getElementById("eb").textContent=HEAD[m][0];document.getElementById("h1").innerHTML=HEAD[m][1];}
+
+function renderHome(){
+  setHead("home");
+  app.innerHTML=`<section class="card q"><h2>¿Para quién buscas ayudas?</h2>
+  <p class="help">Elige una opción para empezar.</p>
+  <div class="opts">
+   <button class="opt go" type="button" id="goMen"><span class="ico" aria-hidden="true">👧</span><span><b>Para un niño o niña (menor de 18 años)</b><small>Hijo, hija o menor a vuestro cargo</small></span><span class="arr" aria-hidden="true">→</span></button>
+   <button class="opt go" type="button" id="goAdu"><span class="ico" aria-hidden="true">🧑</span><span><b>Para una persona adulta (18 años o más)</b><small>Para ti o para un familiar</small></span><span class="arr" aria-hidden="true">→</span></button>
+  </div></section>`;
+  document.getElementById("goMen").onclick=()=>{setHead("men");done=false;step=0;goQ();};
+  document.getElementById("goAdu").onclick=renderAdult;
+  window.scrollTo(0,0);
+}
+
+function renderAdult(){
+  setHead("adu");
+  app.innerHTML=`<section class="card q"><span class="eyebrow">En preparación</span>
+  <h2 style="margin-top:6px">Estamos preparando esta sección</h2>
+  <p class="help">Muy pronto podrás ver aquí las ayudas para personas con discapacidad a partir de los 18 años. Incluirá, entre otras cosas:</p>
+  <ul class="soon"><li>Prestaciones económicas para mayores de 18 años</li><li>Apoyos para tomar decisiones (banco, médicos, papeles)</li><li>Empleo y formación</li><li>Centros de día, vivienda y vida independiente</li></ul>
+  <div class="notice">Mientras tanto, algunas ayudas de la sección de menores también existen para personas adultas, como la tarjeta acreditativa, la tarjeta de aparcamiento, la T-metropolitana rosa, la PUA o el asesoramiento del Centre Sírius. Para orientarte, contacta con la Oficina d'Afers Socials i Famílies de Sant Boi: <span class="nw">93 654 36 11</span>.</div>
+  <div class="nav"><button class="btn" id="home" type="button">Volver al inicio</button></div></section>`;
+  document.getElementById("home").onclick=renderHome;
+  window.scrollTo(0,0);
+}
+
+renderHome();
 </script>
 </body>
 </html>
