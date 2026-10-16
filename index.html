@@ -27,6 +27,8 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 .hi{background:linear-gradient(transparent 55%,var(--hi) 55%,var(--hi) 92%,transparent 92%)}
 .lead{color:var(--muted);margin:10px 0 0}
 .top{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+.logo{align-self:center;width:100%;max-width:380px;margin:0 0 14px;background:#fff;border-radius:14px;padding:8px 12px}
+.logo img{display:block;width:100%;height:auto}
 .eyebrow{font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
 .prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:18px}
@@ -92,13 +94,14 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 <body>
 <div class="wrap">
   <header class="top">
+    <div class="logo"><img src="img/logo-nana.jpg" width="800" height="449" alt="NANA – Núcleo de Acompañamiento y Necesidades del Autismo"></div>
     <span class="eyebrow" id="eb">Sant Boi de Llobregat</span>
     <h1 id="h1">¿A qué ayudas tenéis <span class="hi">derecho</span>?</h1>
     <p class="lead">Responde unas preguntas y verás las ayudas que encajan, dónde se piden y, cuando esté disponible, un vídeo que lo explica paso a paso.</p>
     <div class="notice"><strong>Aviso:</strong> esta web es una guía orientativa, revisada en octubre de 2026. No es una web oficial ni sustituye el asesoramiento de la Administración. Los requisitos, importes, plazos, teléfonos y direcciones pueden cambiar o contener errores: confirma siempre en el organismo oficial antes de hacer un trámite.</div>
   </header>
   <main id="app" aria-live="polite"></main>
-  <p class="foot">Información orientativa basada en el listado de la Direcció General de l'Autonomia Personal i la Discapacitat (Generalitat de Catalunya) y en fuentes oficiales consultadas en octubre de 2026. Importes, plazos y requisitos pueden cambiar: confirma siempre en el organismo indicado.</p>
+  <p class="foot">Una iniciativa de NANA – Núcleo de Acompañamiento y Necesidades del Autismo.<br>Información orientativa basada en el listado de la Direcció General de l'Autonomia Personal i la Discapacitat (Generalitat de Catalunya) y en fuentes oficiales consultadas en octubre de 2026. Importes, plazos y requisitos pueden cambiar: confirma siempre en el organismo indicado.</p>
 </div>
 
 <script>
