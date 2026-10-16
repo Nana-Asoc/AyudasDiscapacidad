@@ -10,15 +10,15 @@
 /* Layout: one question per screen, then a results list grouped by theme; highlighter-yellow nod to the marked-up paper listing. */
 :root{
   --bg:#F4F6F8; --surface:#FFFFFF; --ink:#16233B; --muted:#5A667A; --line:#D9DFE7;
-  --accent:#1F4FD8; --accent-ink:#FFFFFF; --hi:#FFE45C; --ok:#1E7A4F; --ok-bg:#E3F4EA; --warn:#8A5A00; --warn-bg:#FFF1CC;
+  --accent:#1F4FD8; --accent-ink:#FFFFFF; --hi:#FFE45C; --ok:#1E7A4F; --ok-bg:#E3F4EA; --warn:#8A5A00; --warn-bg:#FFF1CC; --bad:#A12C2C; --bad-bg:#FBE6E6;
   --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'Figtree',system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1624; --surface:#18233A; --ink:#EAF0FA; --muted:#9CA9BF; --line:#2A3752;
-  --accent:#7FA2FF; --accent-ink:#0F1624; --hi:#6B5B00; --ok:#6FD3A0; --ok-bg:#16382A; --warn:#F2C45A; --warn-bg:#3A2E0C; color-scheme:dark}}
+  --accent:#7FA2FF; --accent-ink:#0F1624; --hi:#6B5B00; --ok:#6FD3A0; --ok-bg:#16382A; --warn:#F2C45A; --warn-bg:#3A2E0C; --bad:#FF9C9C; --bad-bg:#3A1717; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0F1624; --surface:#18233A; --ink:#EAF0FA; --muted:#9CA9BF; --line:#2A3752;
-  --accent:#7FA2FF; --accent-ink:#0F1624; --hi:#6B5B00; --ok:#6FD3A0; --ok-bg:#16382A; --warn:#F2C45A; --warn-bg:#3A2E0C; color-scheme:dark}
+  --accent:#7FA2FF; --accent-ink:#0F1624; --hi:#6B5B00; --ok:#6FD3A0; --ok-bg:#16382A; --warn:#F2C45A; --warn-bg:#3A2E0C; --bad:#FF9C9C; --bad-bg:#3A1717; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
 .wrap{max-width:720px;margin-inline:auto}
@@ -87,6 +87,29 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 .chk input{width:18px;height:18px;accent-color:var(--accent)}
 .foot{margin-top:34px;font-size:.84rem;color:var(--muted)}
 .foot a{color:var(--accent)}
+.pz{margin-top:10px}
+.pz summary{cursor:pointer;list-style:none;display:inline-block}
+.pz summary::-webkit-details-marker{display:none}
+.pzb{display:inline-block;font-size:.82rem;font-weight:600;border-radius:999px;padding:4px 11px}
+.pzb.open{background:var(--ok-bg);color:var(--ok)}
+.pzb.soon,.pzb.ask{background:var(--warn-bg);color:var(--warn)}
+.pzb.closed{background:var(--bad-bg);color:var(--bad)}
+.pzb.any{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.pzc{font-size:.9rem;color:var(--muted);margin-top:6px;display:grid;gap:4px}
+.pzc a{color:var(--accent);font-weight:600}
+.cal{margin-top:22px}
+.cal>h3{font-size:1.05rem;margin-bottom:8px}
+.mes{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:6px}
+.mes.hoy{background:var(--surface);border:1.5px solid var(--accent);border-radius:10px;padding:10px 12px}
+.mes>b{font-family:var(--display)}
+.mes>div b{display:block;font-weight:600}
+.mes small{display:block;color:var(--muted)}
+.pzv{color:var(--accent);font-size:.85rem;font-weight:600;margin-left:6px;white-space:nowrap}
+.cl{display:grid;gap:8px}
+.cl>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.92rem}
+.cl>div b{display:block}
+.cl>div span{color:var(--muted)}
+.home-cal{margin-top:16px;width:100%}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){.prog>i{transition:none}}
 </style>
@@ -417,6 +440,58 @@ const ITEMS=[
   links:[{t:"Centre Sírius – Departament de Drets Socials i Inclusió",u:"https://dretssocials.gencat.cat/ca/ambits_tematics/accessibilitat/centre-autonomia-personal-sirius/"},{t:"UTAC (comunicación aumentativa)",u:"https://www.utac.cat"}]}
 ];
 
+/* ===== PLAZOS: actualizar cada año =====
+   tipo "plazo": per = periodos [inicio, fin, descripción] con fechas confirmadas; meses = meses en que suele estar abierto;
+                 prox = cuándo se espera el siguiente (previsto, a partir del año anterior); src = fuente oficial.
+   tipo "consultar": no hay fechas confirmadas.  tipo "momento": se pide en un momento concreto, no en fechas fijas.
+   Las ayudas que no aparecen aquí se pueden pedir en cualquier momento. */
+const PLAZOS={
+ educativo:{tipo:"plazo",meses:[5,6,7,8,9],per:[["2026-05-19","2026-09-10","Convocatoria del curso 2026-27"]],prox:"mayo de 2027",
+  nota:"Fuera de plazo, hasta el 31 de enero de 2027, solo si la necesidad surgió después y se acredita.",
+  src:{t:"Ficha oficial del Ministerio",u:"https://www.educacionfpydeportes.gob.es/servicios-al-ciudadano/catalogo/general/05/050140/ficha/050140-2026.html"}},
+ inserccion:{tipo:"plazo",meses:[5,6,7],per:[["2026-05-11","2026-05-22","Preinscripción de los IFE, curso 2026-27"]],prox:"mayo de 2027",
+  nota:"Los PFI y PTT se preinscriben entre mayo y julio, según el centro: pregunta en el instituto.",
+  src:{t:"Preinscripción IFE (Tràmits Gencat)",u:"https://tramits.gencat.cat/ca/tramits/tramits-temes/preinscripcio-ife"}},
+ deduccion:{tipo:"plazo",meses:[4,5,6],per:[["2026-04-08","2026-06-30","Campaña de la renta 2025"]],prox:"abril de 2027",
+  nota:"Este plazo es para aplicarla en la declaración de la renta. El cobro de 100 € al mes por adelantado (modelo 143) se puede pedir en cualquier momento.",
+  src:{t:"Campaña de la renta (AEAT)",u:"https://sede.agenciatributaria.gob.es/Sede/Renta.html"}},
+ pua:{tipo:"consultar",nota:"Va por convocatorias. La última que hemos encontrado fue del 31 de marzo al 15 de mayo de 2023. Pregunta si hay una abierta en la Oficina d'Afers Socials i Famílies (93 654 36 11)."},
+ ibi:{tipo:"consultar",nota:"Normalmente hay que pedirla dentro de un plazo ligado al pago del IBI. Pregunta las fechas en la eMAP (93 635 12 12)."},
+ circulacion:{tipo:"consultar",nota:"Pídela antes del periodo de pago del impuesto, mejor en el primer trimestre del año. Confirma las fechas en la eMAP (93 635 12 12)."},
+ recurso:{tipo:"consultar",nota:"La preinscripción se hace cuando se abre cada convocatoria. Pregunta en Cal Ninyo (93 635 12 20) o en la Oficina d'Afers Socials i Famílies."},
+ sumem:{tipo:"consultar",nota:"Pregunta por las fechas de inscripción de cada curso (93 635 12 00, ext. 424)."},
+ vivienda:{tipo:"momento",txt:"Inscripción: en cualquier momento",nota:"La inscripción en el Registro de Solicitantes se puede hacer en cualquier momento. Cada promoción de vivienda tiene su propio plazo."},
+ matriculacion:{tipo:"momento",txt:"Antes de matricular el vehículo"},
+ iva:{tipo:"momento",txt:"Antes de comprar el vehículo"},
+ copago:{tipo:"momento",txt:"Sin plazo: se aplica en la farmacia"},
+ donaciones:{tipo:"momento",txt:"Cuando haya una herencia o donación"}
+};
+const MES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const MC=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+/* Para probar otra fecha: añade ?hoy=2026-06-01 a la dirección */
+const HOY=(()=>{const m=/[?&]hoy=(\d{4}-\d{2}-\d{2})/.exec(location.search);const d=m?new Date(m[1]+"T12:00"):new Date();d.setHours(12,0,0,0);return d;})();
+const fecha=x=>new Date(x+"T12:00");
+const fc=d=>`${d.getDate()} ${MC[d.getMonth()]}`;
+const fl=d=>`${d.getDate()} de ${MES[d.getMonth()]} de ${d.getFullYear()}`;
+/* Estado del plazo de una ayuda: {c: clase, t: texto} */
+function plazoEstado(id){
+  const p=PLAZOS[id];
+  if(!p)return{c:"any",t:"Se puede pedir en cualquier momento"};
+  if(p.tipo==="consultar")return{c:"ask",t:"Consulta el plazo"};
+  if(p.tipo==="momento")return{c:"any",t:p.txt};
+  for(const [a,b] of p.per){const A=fecha(a),B=fecha(b);
+    if(HOY>=A&&HOY<=B)return{c:"open",t:`Plazo abierto hasta el ${fc(B)}`};
+    if(HOY<A)return{c:"soon",t:`Abre el ${fc(A)}`};}
+  return{c:"closed",t:`Plazo cerrado · próximo previsto: ${p.prox}`};
+}
+function plazoHTML(id){
+  const p=PLAZOS[id], e=plazoEstado(id), badge=`<span class="pzb ${e.c}">${esc(e.t)}</span>`;
+  if(!p||(!p.per&&!p.nota))return `<div class="pz">${badge}</div>`;
+  const per=(p.per||[]).map(([a,b,t])=>`<span>${esc(t)}: del ${esc(fl(fecha(a)))} al ${esc(fl(fecha(b)))}.</span>`).join("");
+  const prox=p.prox?`<span>Próximo plazo previsto: ${esc(p.prox)}. Es una previsión según el año anterior: confírmalo.</span>`:"";
+  return `<details class="pz"><summary>${badge}<span class="pzv">Ver fechas ▾</span></summary><div class="pzc">${per}${prox}${p.nota?`<span>${esc(p.nota)}</span>`:""}${p.src?`<a href="${esc(p.src.u)}" target="_blank" rel="noopener">${esc(p.src.t)} ↗</a>`:""}</div></details>`;
+}
+
 const app=document.getElementById("app");
 let ans={extra:[]}, step=0, done=false;
 let seen={};try{seen=JSON.parse(localStorage.getItem("ajudes-lo-tengo")||"{}")}catch(e){}
@@ -457,6 +532,7 @@ function itemHTML(it){
   const ul=it.need&&it.need.length?`<details class="dt"><summary>Qué necesitas</summary><ul>${it.need.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`:"";
   const ct=it.contact&&it.contact.length?`<div class="meta"><div><span class="k">Contacto</span><span class="v">${it.contact.map(esc).join("<br>")}</span></div></div>`:"";
   return `<article class="item ${d?"done":""}"><div class="ih"><h3>${esc(it.t)}</h3><span class="tag ${st}">${st==="ok"?"Te encaja":"Confirmar criterios"}</span></div>
+  ${plazoHTML(it.id)}
   <p class="w">${esc(it.w)}</p>${note?`<p>${esc(note)}</p>`:""}
   <div class="meta"><div><span class="k">Dónde</span><span class="v">${esc(it.org)}</span></div></div>${ct}
   ${ex}${ol}${ul}
@@ -494,6 +570,7 @@ function renderR(){
 const HEAD={
   home:["Sant Boi de Llobregat",'¿A qué ayudas tenéis <span class="hi">derecho</span>?'],
   men:["Menores de 18 años · Sant Boi de Llobregat",'¿A qué ayudas tiene <span class="hi">derecho</span> tu hijo o hija?'],
+  cal:["Menores de 18 años · Sant Boi de Llobregat",'Calendario de <span class="hi">plazos</span>'],
   adu:["Personas adultas · Sant Boi de Llobregat",'¿A qué ayudas tiene <span class="hi">derecho</span> una persona adulta?']};
 function setHead(m){document.getElementById("eb").textContent=HEAD[m][0];document.getElementById("h1").innerHTML=HEAD[m][1];}
 
@@ -504,9 +581,38 @@ function renderHome(){
   <div class="opts">
    <button class="opt go" type="button" id="goMen"><span class="ico" aria-hidden="true">👧</span><span><b>Para un niño o niña (menor de 18 años)</b><small>Hijo, hija o menor a vuestro cargo</small></span><span class="arr" aria-hidden="true">→</span></button>
    <button class="opt go" type="button" id="goAdu"><span class="ico" aria-hidden="true">🧑</span><span><b>Para una persona adulta (18 años o más)</b><small>Para ti o para un familiar</small></span><span class="arr" aria-hidden="true">→</span></button>
-  </div></section>`;
+  </div>
+  <button class="btn home-cal" type="button" id="goCal">📅 Calendario de plazos</button></section>`;
+  document.getElementById("goCal").onclick=renderCal;
   document.getElementById("goMen").onclick=()=>{setHead("men");done=false;step=0;goQ();};
   document.getElementById("goAdu").onclick=renderAdult;
+  window.scrollTo(0,0);
+}
+
+function renderCal(){
+  setHead("cal");
+  const nom=id=>ITEMS.find(i=>i.id===id).t;
+  const ids=Object.keys(PLAZOS);
+  const abiertos=ids.filter(id=>plazoEstado(id).c==="open");
+  const conPlazo=ids.filter(id=>PLAZOS[id].tipo==="plazo");
+  const mesHoy=HOY.getMonth()+1;
+  let meses="";
+  for(let i=0;i<12;i++){const m=(mesHoy-1+i)%12+1;
+    const l=conPlazo.filter(id=>PLAZOS[id].meses.includes(m)).map(id=>{const ms=PLAZOS[id].meses,ini=m===ms[0],fin=m===ms[ms.length-1];
+      return `<div><b>${esc(nom(id))}</b><small>${ini&&fin?"Suele abrir y cerrar este mes":ini?"Suele abrir este mes":fin?"Suele cerrar este mes":"Suele estar abierto"}</small></div>`;});
+    if(l.length)meses+=`<div class="mes ${i===0?"hoy":""}"><b>${MES[m-1][0].toUpperCase()+MES[m-1].slice(1)}${i===0?" · este mes":""}</b>${l.join("")}</div>`;}
+  const card=id=>{const e=plazoEstado(id);return `<div><b>${esc(nom(id))}</b><span class="pzb ${e.c}">${esc(e.t)}</span>${PLAZOS[id].nota&&PLAZOS[id].tipo==="consultar"?`<span style="display:block;margin-top:4px">${esc(PLAZOS[id].nota)}</span>`:""}</div>`;};
+  const siempre=ITEMS.filter(i=>!PLAZOS[i.id]).map(i=>i.t);
+  app.innerHTML=`<section class="card q"><h2>Fechas para pedir las ayudas</h2>
+  <p class="help">Algunas ayudas solo se pueden pedir en unas fechas concretas. Las fechas «previstas» se calculan a partir del año anterior: confírmalas siempre en el organismo oficial.</p>
+  <div class="cal"><h3>🟢 Abierto ahora</h3>${abiertos.length?`<div class="cl">${abiertos.map(card).join("")}</div>`:`<p class="help">Ahora mismo no hay ningún plazo abierto de la lista.</p>`}</div>
+  <div class="cal"><h3>📅 Ayudas con plazo</h3><div class="cl">${conPlazo.map(card).join("")}</div></div>
+  <div class="cal"><h3>🗓️ Mes a mes (próximos 12 meses)</h3>${meses}</div>
+  <div class="cal"><h3>❓ Plazo por confirmar</h3><div class="cl">${ids.filter(id=>PLAZOS[id].tipo==="consultar").map(card).join("")}</div></div>
+  <div class="cal"><h3>⚪ Se pueden pedir en cualquier momento</h3><p class="help">${siempre.map(esc).join(" · ")}</p></div>
+  <div class="nav"><button class="btn" id="home" type="button">Volver al inicio</button><button class="btn pri" id="goMen2" type="button">Ver qué ayudas me encajan</button></div></section>`;
+  document.getElementById("home").onclick=renderHome;
+  document.getElementById("goMen2").onclick=()=>{setHead("men");done=false;step=0;goQ();};
   window.scrollTo(0,0);
 }
 
