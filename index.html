@@ -97,19 +97,7 @@ h1{font-size:clamp(1.7rem,6vw,2.4rem)}
 .pzb.any{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
 .pzc{font-size:.9rem;color:var(--muted);margin-top:6px;display:grid;gap:4px}
 .pzc a{color:var(--accent);font-weight:600}
-.cal{margin-top:22px}
-.cal>h3{font-size:1.05rem;margin-bottom:8px}
-.mes{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:6px}
-.mes.hoy{background:var(--surface);border:1.5px solid var(--accent);border-radius:10px;padding:10px 12px}
-.mes>b{font-family:var(--display)}
-.mes>div b{display:block;font-weight:600}
-.mes small{display:block;color:var(--muted)}
 .pzv{color:var(--accent);font-size:.85rem;font-weight:600;margin-left:6px;white-space:nowrap}
-.cl{display:grid;gap:8px}
-.cl>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.92rem}
-.cl>div b{display:block}
-.cl>div span{color:var(--muted)}
-.home-cal{margin-top:16px;width:100%}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){.prog>i{transition:none}}
 </style>
@@ -570,7 +558,6 @@ function renderR(){
 const HEAD={
   home:["Sant Boi de Llobregat",'¿A qué ayudas tenéis <span class="hi">derecho</span>?'],
   men:["Menores de 18 años · Sant Boi de Llobregat",'¿A qué ayudas tiene <span class="hi">derecho</span> tu hijo o hija?'],
-  cal:["Menores de 18 años · Sant Boi de Llobregat",'Calendario de <span class="hi">plazos</span>'],
   adu:["Personas adultas · Sant Boi de Llobregat",'¿A qué ayudas tiene <span class="hi">derecho</span> una persona adulta?']};
 function setHead(m){document.getElementById("eb").textContent=HEAD[m][0];document.getElementById("h1").innerHTML=HEAD[m][1];}
 
@@ -581,38 +568,9 @@ function renderHome(){
   <div class="opts">
    <button class="opt go" type="button" id="goMen"><span class="ico" aria-hidden="true">👧</span><span><b>Para un niño o niña (menor de 18 años)</b><small>Hijo, hija o menor a vuestro cargo</small></span><span class="arr" aria-hidden="true">→</span></button>
    <button class="opt go" type="button" id="goAdu"><span class="ico" aria-hidden="true">🧑</span><span><b>Para una persona adulta (18 años o más)</b><small>Para ti o para un familiar</small></span><span class="arr" aria-hidden="true">→</span></button>
-  </div>
-  <button class="btn home-cal" type="button" id="goCal">📅 Calendario de plazos</button></section>`;
-  document.getElementById("goCal").onclick=renderCal;
+  </div></section>`;
   document.getElementById("goMen").onclick=()=>{setHead("men");done=false;step=0;goQ();};
   document.getElementById("goAdu").onclick=renderAdult;
-  window.scrollTo(0,0);
-}
-
-function renderCal(){
-  setHead("cal");
-  const nom=id=>ITEMS.find(i=>i.id===id).t;
-  const ids=Object.keys(PLAZOS);
-  const abiertos=ids.filter(id=>plazoEstado(id).c==="open");
-  const conPlazo=ids.filter(id=>PLAZOS[id].tipo==="plazo");
-  const mesHoy=HOY.getMonth()+1;
-  let meses="";
-  for(let i=0;i<12;i++){const m=(mesHoy-1+i)%12+1;
-    const l=conPlazo.filter(id=>PLAZOS[id].meses.includes(m)).map(id=>{const ms=PLAZOS[id].meses,ini=m===ms[0],fin=m===ms[ms.length-1];
-      return `<div><b>${esc(nom(id))}</b><small>${ini&&fin?"Suele abrir y cerrar este mes":ini?"Suele abrir este mes":fin?"Suele cerrar este mes":"Suele estar abierto"}</small></div>`;});
-    if(l.length)meses+=`<div class="mes ${i===0?"hoy":""}"><b>${MES[m-1][0].toUpperCase()+MES[m-1].slice(1)}${i===0?" · este mes":""}</b>${l.join("")}</div>`;}
-  const card=id=>{const e=plazoEstado(id);return `<div><b>${esc(nom(id))}</b><span class="pzb ${e.c}">${esc(e.t)}</span>${PLAZOS[id].nota&&PLAZOS[id].tipo==="consultar"?`<span style="display:block;margin-top:4px">${esc(PLAZOS[id].nota)}</span>`:""}</div>`;};
-  const siempre=ITEMS.filter(i=>!PLAZOS[i.id]).map(i=>i.t);
-  app.innerHTML=`<section class="card q"><h2>Fechas para pedir las ayudas</h2>
-  <p class="help">Algunas ayudas solo se pueden pedir en unas fechas concretas. Las fechas «previstas» se calculan a partir del año anterior: confírmalas siempre en el organismo oficial.</p>
-  <div class="cal"><h3>🟢 Abierto ahora</h3>${abiertos.length?`<div class="cl">${abiertos.map(card).join("")}</div>`:`<p class="help">Ahora mismo no hay ningún plazo abierto de la lista.</p>`}</div>
-  <div class="cal"><h3>📅 Ayudas con plazo</h3><div class="cl">${conPlazo.map(card).join("")}</div></div>
-  <div class="cal"><h3>🗓️ Mes a mes (próximos 12 meses)</h3>${meses}</div>
-  <div class="cal"><h3>❓ Plazo por confirmar</h3><div class="cl">${ids.filter(id=>PLAZOS[id].tipo==="consultar").map(card).join("")}</div></div>
-  <div class="cal"><h3>⚪ Se pueden pedir en cualquier momento</h3><p class="help">${siempre.map(esc).join(" · ")}</p></div>
-  <div class="nav"><button class="btn" id="home" type="button">Volver al inicio</button><button class="btn pri" id="goMen2" type="button">Ver qué ayudas me encajan</button></div></section>`;
-  document.getElementById("home").onclick=renderHome;
-  document.getElementById("goMen2").onclick=()=>{setHead("men");done=false;step=0;goQ();};
   window.scrollTo(0,0);
 }
 
